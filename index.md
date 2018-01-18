@@ -4,3 +4,9 @@
 # See: https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 layout: default
 ---
+
+# Слайды
+
+* [Обзор курса](slides/index.html)
+* [Часть 5. Базовые примитивы многопоточности](slides/day5.html)
+
