@@ -291,7 +291,8 @@ p.success(10)
 				<section>
 					Реализация Future.apply:
 <pre><code class="scala">
-def run[T](f : ⇒ T)(implicit ec: ExecutionContext): Future[T] = {
+def run[T](f : ⇒ T)
+          (implicit ec: ExecutionContext): Future[T] = {
   val p = Promise[T]()
 
   ec.execute(() ⇒ {
@@ -301,9 +302,7 @@ def run[T](f : ⇒ T)(implicit ec: ExecutionContext): Future[T] = {
   p.future
 }
 
-val f: Future[Int] = run {
-  2 * 2
-}
+val f: Future[Int] = run { 2 * 2 }
 </code></pre>
 				</section>
 
@@ -335,7 +334,7 @@ val f3: Future[Int] = f.map(_ * 10)
 				<section>
 					это может работать вот так:
 <pre><code class="scala">
-implicit class RichFuture[T](val f: Future[T]) extends AnyVal {
+implicit class MyFuture[T](val f: Future[T]) extends AnyVal {
   def myMap[R](func: T ⇒ R)
               (implicit ec: ExecutionContext): Future[R] = {
     val p = Promise[R]()
