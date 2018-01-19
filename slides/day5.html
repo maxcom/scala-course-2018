@@ -278,6 +278,132 @@ f.onComplete {
 p.success(10)				
 </code></pre>
 				</section>
+
+				<section>
+					Есть несколько полезных готовых функций:
+					<ul>
+						<li>Future.apply - запуск функции в отдельном потоке
+						<li>Future.successful - конструирование завершенной Future
+						<li>Future.failed - конструирование завершенной с ошибкой Future
+					</ul>
+				</section>
+
+				<section>
+					Реализация Future.apply:
+<pre><code class="scala">
+def run[T](f : ⇒ T)(implicit ec: ExecutionContext): Future[T] = {
+  val p = Promise[T]()
+
+  ec.execute(() ⇒ {
+    p.complete(Try(f))
+  })
+
+  p.future
+}
+
+val f: Future[Int] = run {
+  2 * 2
+}
+</code></pre>
+				</section>
+
+				<section>
+					Используем Future.apply:
+<pre><code class="scala">
+val f2: Future[Int] = Future {
+  2 * 2
+}
+</code></pre>
+				</section>
+
+				<section>
+					<h3>Трансформации Future</h3>
+
+					Работать с callback'ами плохо - когда их много код плохо читается и его тяжело отлаживать.
+
+					Есть более удобные способы.
+				</section>
+
+				<section>
+					Функция map преобразует значение в Future, например:
+<pre><code class="scala">
+val f3: Future[Int] = f.map(_ * 10)
+</code></pre>
+					функция будет выполнена тогда, когда значение f будет вычислено
+				</section>
+
+				<section>
+					это может работать вот так:
+<pre><code class="scala">
+implicit class RichFuture[T](val f: Future[T]) extends AnyVal {
+  def myMap[R](func: T ⇒ R)
+              (implicit ec: ExecutionContext): Future[R] = {
+    val p = Promise[R]()
+
+    f.onComplete {
+      case Success(v)  ⇒ p.complete(Try(func(v)))
+      case Failure(ex) ⇒ p.failure(ex)
+    }
+
+    p.future
+  }
+}
+</code></pre>
+
+				</section>
+				<section>
+					<ul>
+						<li>flatMap[S](f: T =&gt; Future[S]): Future[S]
+						<li>transform[S](f: Try[T] =&gt; Try[S]): Future[S]
+						<li>transformWith[S](f: Try[T] =&gt; Future[S]): Future[S]
+					</ul>
+				</section>
+
+				<section>
+					Пример цепочки трансформаций:
+<pre><code class="scala">
+def userByEmail(email: String): Future[Int] = ???
+
+def ticketsByUser(user: Int): Future[Seq[Int]] = ???
+
+def userActive(user: Int): Boolean = 
+  Set(1, 42).contains(user)
+
+val count: Future[Int] = 
+  userByEmail("user1@test")
+    .filter(userActive)
+    .flatMap(ticketsByUser)
+    .map(_.length)
+</code></pre>
+					
+				</section>
+
+				<section>
+					Future - монада, для трансформаций можно использовать for:
+<pre><code class="scala">
+val count: Future[Int] = for {
+  user &lt;- userByEmail("user1@test") if userActive(user)
+  tickets &lt;- ticketsByUser(user)
+} yield {
+  tickets.length
+}
+
+</code></pre>
+				</section>
+
+				<section>
+					Совет: избегайте в своем коде таких типов как Future[Future[...]], Future[Try[...]] и Try[Future[...]].
+					Это источник проблем.
+				</section>
+
+				<section>
+					<h3>Домашнее задание</h3>
+					Реализуем при помощи Promise
+					<ol>
+						<li>Функцию flatten для преобразования Future[Future[T]] =&gt; Future[T]
+						<li>Функцию sequence для преобразования Seq[Future[T]] =&gt; Future[Seq[T]]
+					</ol>
+				</section>
 			</div>
 
 		</div>
