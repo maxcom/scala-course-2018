@@ -193,6 +193,91 @@ public final int incrementAndGet() {
 }
 </code></pre>			
 				</section>
+				<section>
+					<h3>Future[T]</h3>
+					Future - результат отложенного вычисления.
+				</section>
+				<section>
+					Три базовых способа использования:
+					<ul>
+						<li>Подождать пока выполнится
+						<li>Опросить состояние
+						<li>Добавить callback
+					</ul>
+				</section>
+				<section>
+					Ожидание выполнения
+<pre><code class="scala">
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration._
+
+val f: Future[Int] = ???
+
+val result: Int = Await.result(f, 5 minutes)
+</code></pre>
+блокирует текущий поток до получения результата
+				</section>
+				<section>
+					Опрос состояния
+<pre><code class="scala">
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
+
+val f: Future[Int] = ???
+
+f.value match {
+  case Some(Success(value)) ⇒
+    println(value)
+  case Some(Failure(ex)) ⇒
+    throw ex
+  case None ⇒
+    println("Not completed :-(")
+}					
+</code></pre>
+				</section>
+
+				<section>
+					Добавляем callback
+<pre><code class="scala">
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
+
+val f: Future[Int] = ???
+implicit val ec: ExecutionContext = ???
+
+f.onComplete { // выполняется в потоке ec
+  case Success(value) ⇒
+    println(value)
+  case Failure(ex) ⇒
+    println(s"Failed: ${ex.toString}")
+}
+</code></pre>
+				</section>
+				
+				<section>
+					<h3>Promise[T]</h3>
+					Promise - контейнер для результата отложенного вычисления.
+					<ul>
+						<li>Значение можно сохранить один раз
+						<li>Значение завершает связанную с ним Future
+					</ul>
+				</section>
+
+				<section>
+<pre><code class="scala">
+val p: Promise[Int]
+val f: Future[Int] = p.future
+
+f.onComplete {
+  case Success(value) ⇒
+    println(value)
+  case Failure(ex) ⇒
+    println(s"Failed: ${ex.toString}")
+}
+
+p.success(10)				
+</code></pre>
+				</section>
 			</div>
 
 		</div>
