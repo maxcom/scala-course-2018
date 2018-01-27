@@ -33,8 +33,9 @@
 					<h3>План</h2>
 					<ol>
 						<li>Каждому клиенту по потоку
+						<li>Все клиенты в одном потоке: примеры
 						<li>Введение в Java NIO
-						<li>Все клиенты в одном потоке: Event Loop
+						<li>Event Loop
 						<li>Совмещаем event loop и многопоточность
 					</ol>
 				</section>
@@ -51,7 +52,7 @@ val greetings: Array[Byte] =
   "Hello, world!".getBytes(US_ASCII)
 
 while (true) { // упрощенный вариант сервера
-  val socket = serverSocket.accept()
+  val socket: Socket = serverSocket.accept()
   executor.execute { () ⇒
     socket.getOutputStream.write(greetings)
     socket.close()
@@ -92,14 +93,110 @@ while (true) { // упрощенный вариант сервера
 				</section>
 
 				<section>
+					<h2>Все клиенты в одном потоке</h2>
+
+					<p>Можно ли обработать всех клиентов в одном потоке?
+
+					<p>Да, с использованием мультиплексированного ввода вывода.
+				</section>
+
+				<section>
+					Такая архитектура показала свою эффективность.
+
+					<p>Например:
+
+					<ul>
+						<li>Веб-сервер NGINX
+						<li>СУБД Redis
+						<li>Сервер приложений node.js
+					</ul>
+				</section>
+
+				<section>
+					Плюсы такой схемы:
+					<ul>
+						<li>"Пассивные клиенты" почти не нагружают приложения
+						<li>Нет параллельности - нет недетерминизма и сложностей
+						<li>Меньше context switch - эффективнее для ОС и процессора
+					</ul>
+				</section>
+
+				<section>
 					<h2>Введение в Java NIO</h2>
 					<p>Java NIO - низкоуровневые API для ввода-вывода.
 
 					<p>"New IO" - "новый" API (2002 год).
 
-					<p>Дополняется в каждой новой версии JDK
+					<p>Дополняется в каждой новой версии JDK.
 				</section>
 
+				<section>
+					<p>Java IO - потоковые чтение/запись (stream, не путаем с thread!)
+					<p>Java NIO - блочные чтение/запись
+				</section>
+
+				<section>
+					Блочный I/O оптимальнее потокового, он избегает лишних копирований
+					и преобразований данных.
+
+					Нам NIO интересен тем, что только в нем есть неблокирующий ввод-вывод.
+				</section>
+
+				<section>
+					<h4>Неблокирующий ввод-вывод</h4>
+					
+					Специальный режим сокета.
+<pre><code class="scala">
+socketChannel.configureBlocking(false)
+</code></pre>
+				</section>
+				<section>
+					<p>Блокирущий read: читает сколько может; если данных нет - ждет 
+
+					<p>Неблокирующий read: мгновенно читает сколько может; нет данных - пустой результат
+				</section>
+
+				<section>
+					<p>Блокирующий write: пишет всё что передали; если клиент не успевает - ждет и продолжает
+					<p>Неблокирующий write: мгновенно пишет сколько может; если клиент не готов - ничего не пишет
+				</section>
+
+				<section>
+<pre><code class="scala">
+  executor.execute { () ⇒
+    val buffer: ByteBuffer = ByteBuffer.wrap(greetings)
+
+    while (buffer.hasRemaining) {
+      socket.write(buffer)
+    }
+
+    socket.close()
+  }
+</code></pre>
+				</section>
+
+				<section>
+					Постоянно опрашивать сокеты в ожидании готовности не эффективно.
+				</section>
+
+				<section>
+					Selector - мониторинг состояния сокетов.
+				</section>
+
+				<section>
+<pre><code class="scala">
+val selector: Selector = Selector.open()
+socket.configureBlocking(false)
+val key = socket.register(selector, SelectionKey.OP_WRITE)
+
+while (buffer.hasRemaining) {
+  selector.select() // блокируется
+  if (key.isWritable) {
+    socket.write(buffer)
+  }
+}
+</code></pre>
+				</section>
 			</div>
 
 		</div>
