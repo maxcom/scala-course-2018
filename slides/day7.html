@@ -197,6 +197,116 @@ while (buffer.hasRemaining) {
 }
 </code></pre>
 				</section>
+
+				<section>
+					<h2>Event Loop - используем один Selector на всех клиентов</h2>
+				</section>
+
+				<section>
+<pre><code class="scala">val selector: Selector = Selector.open()
+
+serverSocket.register(selector, SelectionKey.OP_ACCEPT, 
+  () -> println("Got new connection"))
+
+while (true) {
+  selector.select()
+
+  val selectionKeys = selector.selectedKeys.asScala
+
+  selectionKeys.foreach { sk ⇒
+    sk.attachment().asInstanceOf[Runnable].run()
+  }
+}
+</code></pre>
+				</section>
+
+				<section>
+					Итого:
+					<ul>
+						<li>"Реактивная логика", основанная на событиях
+						<li>Неограниченное количество клиентов на один поток
+					</ul>
+				</section>
+
+				<section>
+					Такой подход не сочитается с:
+					<ul>
+						<li>Долгими вычислениями на CPU
+						<li>Блокирующимися вызовами
+						<li>Вызовами асинхронных API
+					</ul>
+				</section>
+
+				<section>
+					<h2>Комбинируем потоки и Event Loop</h2>
+				</section>
+
+				<section>
+					<p>Раньше наши обработчики работали прямо в нашем потоке.
+
+					<p>Сделаем их функциями <br> Unit ⇒ Future[Action]
+				</section>
+
+				<section>
+					Вызов такой функции делается просто:
+<pre><code class="scala">selectionKeys.foreach { sk ⇒
+  sk.interestOps(0)
+  sk.attachment().asInstanceOf[() ⇒ Future[Action]].apply()
+}
+</code></pre>
+					но как "вернуть" сокет обратно в работу?
+				</section>
+
+				<section>
+					<ul>
+					<li>Selector - не потокобезопасный (почти)
+					<li>да и он все время занят чем-то
+					</ul>
+				</section>
+
+				<section>
+					Создаем специальный Executor:
+<pre><code class="scala">val queue = new ConcurrentLinkedQueue[Runnable]
+val executor: Executor = task ⇒ queue.add(task)
+</code></pre>
+					очередь разбираем цикле обработки событий:
+<pre><code class="scala">var task: Runnable = _
+while ({ task = queue.poll(); task } != null) {
+  task.run()
+}
+</code></pre>
+				</section>
+
+				<section>
+					При добавлении задачи прерываем ожидание select()
+<pre><code class="scala">val reactorExecutor = ExecutionContext.fromExecutor { r ⇒
+  queue.add(r)
+  selector.wakeup()
+}
+</code></pre>
+				</section>
+
+				<section>
+<pre><code class="scala">selectionKeys.foreach { sk ⇒
+  sk.interestOps(0)
+  sk.attachment()
+    .asInstanceOf[() ⇒ Future[Action]]
+    .apply()
+    .onComplete(processAction)(reactorExecutor)
+}
+</code></pre>
+				</section>
+
+				<section>
+					Итого мы получили:
+
+					<ul>
+						<li>event loop для эффективного ввода-вывода
+						<li>возможность использования thread pool вычислений
+						    и блокирующихся вызовов
+						<li>возможность использования асинхронных API
+					</ul>
+				</section>
 			</div>
 
 		</div>
