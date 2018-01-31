@@ -36,9 +36,8 @@
 						<li>Обзор курса
 						<li>Средства разработки
 						<li>Case-классы
-						<li>Pattern matching
 						<li>Алгебраические типы. 
-						<li>Pattern matching для коллекций. 
+						<li>Pattern matching
 					</ol>
 				</section>
 				<section>
@@ -81,6 +80,131 @@
 					<p>рассмотрим базовые возможности языка<br>
 					и перейдем к практике
 				</section>
+
+				<section>
+					<h2>Средства разработки</h2>
+
+					Есть много вариантов, мы будем использовать<br>
+					Intellij IDEA Community Edition + Scala plugin
+					
+					<p><a target="_blank" href="https://www.jetbrains.com/idea/download/">https://www.jetbrains.com/idea/download/</a>
+				</section>
+
+				<section>
+					<ol>
+						<li>Ставим IDEA, запускаем
+						<li>Добавляем Scala plugin (configure -&gt; plugins)
+						<li>Создаем новый проект Scala
+							<li>Выбираем sbt; версии самые новые <br>(Scala 2.12.4; sbt 1.1.0)
+					</ol>
+				</section>
+
+				<section>
+					<h2>Case-классы</h2>
+					<pre><code class="scala">
+case class Address(`type`: String, value: String) {
+  def toStringAddress = s"${`type`}:$value"
+}
+					</code></pre>
+					<ul>
+						<li class="fragment">геттеры для полей</li>
+						<li class="fragment">toString</li>
+						<li class="fragment">equals и hashcode</li>
+						<li class="fragment">создание без "new"</li>
+						<li class="fragment">экстрактор</li>
+				</section>
+
+				<section>
+					<h2>Экстракторы</h2>
+					<p>Можно разобрать класс обратно:</p>
+					<pre><code class="scala">
+val address = Address("email", "abuse@sportloto.ru")
+
+val Address(_, email) = address
+					</pre></code>
+				</section>
+
+				<section>
+					Статическая фабрика и экстрактор:
+					<pre><code class="scala">
+object Address {
+  def apply(`type`: String, value: String) = 
+    new Address(`type`, value)
+  
+  def unapply(address: Address): Option[(String, String)] =
+    Some((address.`type`, address.value))
+}
+					</code></pre>
+					<small>* объект-компаньон, заменяет static декларации Java</small>
+					<small>* для case классов apply/unapply создаются автоматически</small>
+				</section>
+
+				<section>
+					<h2>Алгебраические типы</h2>
+					<p>Case классы можно объединить в иерархию</p>
+					<pre><code class="scala">
+trait Endpoint
+
+case class Person(personId: SearchPersonId) extends Endpoint
+case class ExactAddress(email: Address) extends Endpoint
+case class Group(groupId: UUID) extends Endpoint
+case class Domain(domain: String) extends Endpoint
+					</code></pre>
+					<small>* дальше будет более правильная версия этого примера</small>
+				</section>
+
+				<section>
+					<h2>Pattern matching</h2>
+					<pre><code class="scala">
+val endpoint: Endpoint = ExactAddress(address)
+
+endpoint match {
+  case Person(personId) ⇒ 
+    Json.obj("type" -> "person", "id" -> personId)
+  case Group(groupId) ⇒ 
+    Json.obj("type" -> "group", "id" -> groupId)
+  case Domain(domain) ⇒ 
+    Json.obj("type" -> "domain", "id" -> domain)
+  case ExactAddress(addr) ⇒ 
+    Json.obj("type" -> addr.`type`, "id" -> addr.value)
+}
+					</code></pre>
+				</section>
+
+				<section>
+					<h2>Более правильная версия примера</h2>
+					<pre><code class="scala">
+sealed trait Endpoint with Product with Serializable
+
+final case class Person(personId: SearchPersonId) 
+  extends Endpoint
+final case class ExactAddress(email: Address) 
+  extends Endpoint
+final case class Group(groupId: UUID) 
+  extends Endpoint
+final case class Domain(domain: String) 
+  extends Endpoint
+					</code></pre>
+				</section>
+
+
+				<section>
+					<h2>Pattern matching для списков</h2>
+					<pre><code class="scala">
+val list = Seq(1, 2, 3, 4, 5)
+val list2 = 1 +: 2 +: 3 +: 4 +: 5 +: Nil
+val list3 = 1 +: (2 +: (3 +: (4 +: (5 +: Nil))))
+
+list match {
+  case Seq()    ⇒ "empty"
+  case Seq(one) ⇒ s"only one element $one"
+  case one +: _ ⇒ s"at least one element $one"  
+}
+					</code></pre>
+					<small>* +: это оператор для списка и еще специальный объект с методом unapply</small>
+				</section>
+
+
 			</div>
 
 		</div>
