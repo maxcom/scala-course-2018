@@ -34,7 +34,7 @@
 					<ol>
 						<li>Материалы курса, обратная связь
 						<li>Обзор курса
-						<li>Средства разработки
+						<li>Средства разработки и первые шаги
 						<li>Case-классы
 						<li>Алгебраические типы. 
 						<li>Pattern matching
@@ -97,6 +97,39 @@
 						<li>Создаем новый проект Scala
 							<li>Выбираем sbt; версии самые новые <br>(Scala 2.12.4; sbt 1.1.0)
 					</ol>
+				</section>
+
+				<section>
+					<h2>Hello, World!</h2>
+
+					<pre><code class="scala">
+object HelloWorld {
+  def main(args: Array[String]): Unit = {
+    println("Hello, world!")
+  }
+}
+					</code></pre>
+				</section>
+
+				<section>
+					Структура проекта (sbt):
+					<pre><code>
+build.sbt       -- настройки сборки
+project         -- еще настройки сборки
+project/target  -- кеш компилятора и вспомогательные файлы
+src             -- исходные файлы и ресурсы
+src/main        -- основной код
+src/main/scala  -- основной код на Scala
+src/test        -- исходные файлы и ресурсы тестов
+src/test/scala  -- код тестов на Scala
+target          -- результат компиляции
+					</code></pre>
+				</section>
+
+				<section>
+					Интерактивная разработка: Scala Worksheet
+
+					<img src="worksheet.png">
 				</section>
 
 				<section>
