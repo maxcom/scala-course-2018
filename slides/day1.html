@@ -133,6 +133,23 @@ target          -- результат компиляции
 				</section>
 
 				<section>
+					<h3>Немного о коллекциях</h3>
+
+					Подробно устройство коллекций рассмотрим на втором занятии.
+				</section>
+
+				<section>
+					<p>Seq[T] - общий тип для коллекций, имеющих определенный порядок
+					   (списки, массивы, вектора и т.п.)
+					<p>ArrayBuffer[T] - аналог ArrayList из Java
+					<p>Vector[T] - неизменяемый аналог ArrayList
+				</section>
+
+				<section>
+					TODO: несколько операций над Seq
+				</section>
+
+				<section>
 					<h2>Case-классы</h2>
 					<pre><code class="scala">
 case class Address(`type`: String, value: String) {
@@ -221,6 +238,10 @@ final case class Domain(domain: String)
 				</section>
 
 				<section>
+					TODO: почему более правильная?
+				</section>
+
+				<section>
 					<h3>Option</h3>
 					TODO
 				</section>
@@ -237,15 +258,6 @@ final case class Domain(domain: String)
 
 				<section>
 					<h2>Pattern matching для списков</h2>
-
-					Рассмотрим несколько стандартных коллекций.
-
-					Подробно устройство коллекций рассмотрим на втором занятии.
-				</section>
-				<section>
-					TODO
-				</section>
-				<section>
 					<pre><code class="scala">
 val list = Seq(1, 2, 3, 4, 5)
 val list2 = 1 +: 2 +: 3 +: 4 +: 5 +: Nil
