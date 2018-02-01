@@ -205,7 +205,7 @@ endpoint match {
 				</section>
 
 				<section>
-					<h2>Более правильная версия примера</h2>
+					<h3>Более правильная версия примера</h3>
 					<pre><code class="scala">
 sealed trait Endpoint with Product with Serializable
 
@@ -220,9 +220,32 @@ final case class Domain(domain: String)
 					</code></pre>
 				</section>
 
+				<section>
+					<h3>Option</h3>
+					TODO
+				</section>
+
+				<section>
+					<h3>Try</h3>
+					TODO
+				</section>
+
+				<section>
+					<h3>Either</h3>
+					TODO
+				</section>
 
 				<section>
 					<h2>Pattern matching для списков</h2>
+
+					Рассмотрим несколько стандартных коллекций.
+
+					Подробно устройство коллекций рассмотрим на втором занятии.
+				</section>
+				<section>
+					TODO
+				</section>
+				<section>
 					<pre><code class="scala">
 val list = Seq(1, 2, 3, 4, 5)
 val list2 = 1 +: 2 +: 3 +: 4 +: 5 +: Nil
@@ -237,6 +260,13 @@ list match {
 					<small>* +: это оператор для списка и еще специальный объект с методом unapply</small>
 				</section>
 
+				<section>
+					<h2>Домашнее задание</h2>
+
+					Реализуем сортировку слиянием (merge sort) для Vector[Int]
+
+					<p>TODO
+				</section>
 
 			</div>
 
