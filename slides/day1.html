@@ -133,6 +133,22 @@ target          -- результат компиляции
 				</section>
 
 				<section>
+					<h3>Переменные и функции</h3>
+
+					можно присвоить имя результату выражения:
+					<pre><code class="scala">val something = 10 // константа</code></pre>
+					<pre><code class="scala">var something: Int = 10 // переменная</code></pre>
+				</section>
+
+				<section>
+					объявление функции:
+					<pre><code class="scala">def square(x: Int) = x * x</code></pre>
+					функция - это значение:
+					<pre><code class="scala">val f: (Int ⇒ Int) = square</code></pre>
+					(её тип - Function1[Int, Int])
+				</section>
+
+				<section>
 					<h3>Немного о коллекциях</h3>
 
 					Подробно устройство коллекций рассмотрим на втором занятии.
@@ -146,7 +162,30 @@ target          -- результат компиляции
 				</section>
 
 				<section>
-					TODO: несколько операций над Seq
+					<pre><code class="scala">
+val buffer = ArrayBuffer[Int](1, 2, 3)
+
+buffer += 4 // добавление элемента
+
+buffer(1) // получение элемента
+
+// buffer еще и функция
+val f: (Int ⇒ Int) = buffer
+					</code></pre>
+				</section>
+
+				<section>
+					неизменяемые коллекции интереснее:
+					<pre><code class="scala">
+val vector = Vector(2, 3, 4)
+
+// читаем слева направо 
+val v2: Vector[Int] = vector :+ 5 :+ 6
+  
+// читаем справа налево
+val v3: Vector[Int] = 0 +: 1 +: vector	
+val v4: Vector[Int] = 0 +: (1 +: vector)
+					</code></pre>
 				</section>
 
 				<section>
@@ -193,12 +232,11 @@ object Address {
 					<h2>Алгебраические типы</h2>
 					<p>Case классы можно объединить в иерархию</p>
 					<pre><code class="scala">
-trait Endpoint
+sealed trait Expr
 
-case class Person(personId: SearchPersonId) extends Endpoint
-case class ExactAddress(email: Address) extends Endpoint
-case class Group(groupId: UUID) extends Endpoint
-case class Domain(domain: String) extends Endpoint
+case class Number(value: Int) extends Expr
+case class Plus(lhs: Expr, rhs: Expr) extends Expr
+case class Minus(lhs: Expr, rhs: Expr) extends Expr
 					</code></pre>
 					<small>* дальше будет более правильная версия этого примера</small>
 				</section>
@@ -206,39 +244,46 @@ case class Domain(domain: String) extends Endpoint
 				<section>
 					<h2>Pattern matching</h2>
 					<pre><code class="scala">
-val endpoint: Endpoint = ExactAddress(address)
+def value(expression: Expr): Int = expression match {
+  case Number(value)   ⇒ value
+  case Plus(lhs, rhs)  ⇒ value(lhs) + value(rhs)
+  case Minus(lhs, rhs) ⇒ value(lhs) - value(rhs)
+}				
 
-endpoint match {
-  case Person(personId) ⇒ 
-    Json.obj("type" -> "person", "id" -> personId)
-  case Group(groupId) ⇒ 
-    Json.obj("type" -> "group", "id" -> groupId)
-  case Domain(domain) ⇒ 
-    Json.obj("type" -> "domain", "id" -> domain)
-  case ExactAddress(addr) ⇒ 
-    Json.obj("type" -> addr.`type`, "id" -> addr.value)
-}
+val result = value(Plus(Number(2), Number(2)))
 					</code></pre>
 				</section>
 
 				<section>
 					<h3>Более правильная версия примера</h3>
 					<pre><code class="scala">
-sealed trait Endpoint with Product with Serializable
+sealed trait Expr extends Product with Serializable
 
-final case class Person(personId: SearchPersonId) 
-  extends Endpoint
-final case class ExactAddress(email: Address) 
-  extends Endpoint
-final case class Group(groupId: UUID) 
-  extends Endpoint
-final case class Domain(domain: String) 
-  extends Endpoint
+final case class Number(value: Int) extends Expr
+final case class Plus(lhs: Expr, rhs: Expr) extends Expr
+final case class Minus(lhs: Expr, rhs: Expr) extends Expr
 					</code></pre>
 				</section>
 
 				<section>
-					TODO: почему более правильная?
+					почему "extend Product with Serializeable"?
+					<pre><code class="scala">
+val number: Expr = Number(3)
+val expr = Plus(Number(2), Number(2))
+val buffer = ArrayBuffer(Number(1), expr)
+
+// не компилируется
+buffer += number
+					</code></pre>
+					<p class="fragment">потому что тип buffer вот такой:
+					<pre class="fragment"><code class="scala">
+ArrayBuffer[Product with Serializable with Expr]
+					</code></pre>
+				</section>
+
+				<section>
+					почему "final case class"?
+					<p>TODO
 				</section>
 
 				<section>
@@ -261,7 +306,6 @@ final case class Domain(domain: String)
 					<pre><code class="scala">
 val list = Seq(1, 2, 3, 4, 5)
 val list2 = 1 +: 2 +: 3 +: 4 +: 5 +: Nil
-val list3 = 1 +: (2 +: (3 +: (4 +: (5 +: Nil))))
 
 list match {
   case Seq()    ⇒ "empty"
