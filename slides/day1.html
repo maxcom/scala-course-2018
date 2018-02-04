@@ -432,7 +432,26 @@ list match {
   case one +: _ ⇒ s"at least one element $one"  
 }
 					</code></pre>
-					<small>* +: это оператор для списка и еще специальный объект с методом unapply</small>
+				</section>
+
+				<section>
+					Pattern matching с условиями
+
+					<pre><code class="scala">
+val list = List(1, 2, 3, 4, 5)
+
+list match {
+  // второй элемент 10; выкинем его   
+  case head +: 10 +: tail ⇒
+    head +: tail
+  // первый элемент четный, выкинем его  
+  case head +: tail if head % 2 == 0 ⇒
+    tail
+  // не падаем на других вариантах  
+  case other ⇒
+    other
+}					
+					</code></pre>
 				</section>
 
 				<section>
