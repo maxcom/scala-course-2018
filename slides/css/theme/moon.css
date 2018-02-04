@@ -2,6 +2,7 @@
  * Solarized Dark theme for reveal.js.
  * Author: Achim Staebler
  */
+@import url(../../lib/font/source-sans-pro/source-sans-pro.css);
 @import url(../../lib/font/league-gothic/league-gothic.css);
 @import url(https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic);
 /**
@@ -19,7 +20,8 @@ body {
   background-color: #002b36; }
 
 .reveal {
-  font-family: "Lato", sans-serif;
+  //font-family: "Lato", sans-serif;
+  font-family: "Source Sans Pro", Helvetica, sans-serif;
   font-size: 40px;
   font-weight: normal;
   color: #93a1a1; }
@@ -50,14 +52,29 @@ body {
 .reveal h6 {
   margin: 0 0 20px 0;
   color: #eee8d5;
-  font-family: "League Gothic", Impact, sans-serif;
-  font-weight: normal;
+  //font-family: "League Gothic", Impact, sans-serif;
+  font-family: "Source Sans Pro", Helvetica, sans-serif;
+  //font-weight: normal;
+  font-weight: 600;
   line-height: 1.2;
   letter-spacing: normal;
   text-transform: uppercase;
   text-shadow: none;
   word-wrap: break-word; }
 
+.reveal h1 {
+  font-size: 2.5em; }
+
+.reveal h2 {
+  font-size: 1.6em; }
+
+.reveal h3 {
+  font-size: 1.3em; }
+
+.reveal h4 {
+  font-size: 1em; }
+
+/*
 .reveal h1 {
   font-size: 3.77em; }
 
@@ -69,7 +86,7 @@ body {
 
 .reveal h4 {
   font-size: 1em; }
-
+*/
 .reveal h1 {
   text-shadow: none; }
 
