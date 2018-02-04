@@ -190,6 +190,33 @@ val v4: Vector[Int] = 0 +: (1 +: vector)
 				</section>
 
 				<section>
+					<h2>Пара (tuple)</h2>
+
+					Комбинация из двух значений:
+					<pre><code class="scala">
+val pair: (Int, Int) = (1, 2)
+// Tuple2[Int, Int]
+					</code></pre>
+					<p>деконструкция</p>
+					<pre><code class="scala">
+val (first, second) = pair
+					</code></pre>
+					<p>бывают еще "тройки" и более - до 22
+				</section>
+
+				<section>
+					Пример: разделение Vector на две части
+					<pre><code class="scala">
+val v = Vector(1, 2, 3, 4)
+
+val (first, second) = v.splitAt(v.length / 2)
+
+// first == Vector(1,2)
+// second == Vector(3,4)
+					</code></pre>
+				</section>
+
+				<section>
 					<h2>Case-классы</h2>
 					<pre><code class="scala">
 case class Address(`type`: String, value: String) {
@@ -316,7 +343,7 @@ if (r.isDefined) {
 				</section>
 
 				<section>
-					несколько правильный вариантов:
+					несколько правильных вариантов:
 					<pre><code class="scala">
 r match {
   case Some(k) ⇒ println(k)
