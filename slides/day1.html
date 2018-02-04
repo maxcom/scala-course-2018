@@ -159,6 +159,7 @@ target          -- результат компиляции
 					   (списки, массивы, вектора и т.п.)
 					<p>ArrayBuffer[T] - аналог ArrayList из Java
 					<p>Vector[T] - неизменяемый аналог ArrayList
+					<p>List[T] - неизменяемый связный список
 				</section>
 
 				<section>
@@ -395,7 +396,7 @@ vector.count(x ⇒ x.isSuccess)
 				<section>
 					<h2>Pattern matching для списков</h2>
 					<pre><code class="scala">
-val list = Seq(1, 2, 3, 4, 5)
+val list = List(1, 2, 3, 4, 5)
 val list2 = 1 +: 2 +: 3 +: 4 +: 5 +: Nil
 
 list match {
@@ -410,11 +411,12 @@ list match {
 				<section>
 					<h2>Домашнее задание</h2>
 
-					Реализуем сортировку слиянием (merge sort) для Vector[Int]
+					Реализуем сортировку слиянием (merge sort)<br> для Vector[Int]
 
-					<p>TODO
+					<p>Описание алгоритма: <a target="_blank" href="https://ru.wikipedia.org/wiki/%D0%A1%D0%BE%D1%80%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D0%B0_%D1%81%D0%BB%D0%B8%D1%8F%D0%BD%D0%B8%D0%B5%D0%BC">на wikipedia</a> 
+					<p>Неплохая <a target="_blank" href="https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html">визуализация</a><br> (надо выбрать "merge sort")
+					<p>Справка на Vector: <a target="_blank" href="http://www.scala-lang.org/api/2.12.4/scala/collection/immutable/Vector.html">scaladoc</a>.
 				</section>
-
 			</div>
 
 		</div>
