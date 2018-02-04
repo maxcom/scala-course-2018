@@ -288,8 +288,43 @@ ArrayBuffer[Product with Serializable with Expr]
 				</section>
 
 				<section>
-					<h3>Option</h3>
-					TODO
+					<h3>Option[T]</h3>
+					Тип с двумя вариантами:
+					<ul>
+						<li>Some[T] - контейнер для одного значения
+						<li>None - значение отсутствует
+					</ul>
+					<p>более безопасная замена null
+				</section>
+
+				<section>
+					<pre><code class="scala">
+val v = Vector(1, 2, 3, 4, 5)
+
+val r: Option[Int] = v.find(x ⇒ x > 2)
+
+// r = Some(3)				
+					</code></pre>
+
+					<p class="fragment">плохой вариант работы с Option:
+					<pre class="fragment"><code class="scala">
+if (r.isDefined) {
+  println(r.get) // бросает исключение если значения нет
+}					
+					</code></pre>
+				</section>
+
+				<section>
+					несколько правильный вариантов:
+					<pre><code class="scala">
+r match {
+  case Some(k) ⇒ println(k)
+  case None    ⇒ println("None")  
+}
+
+println(r.getOrElse("None"))
+					</code></pre>
+					еще варианты рассмотрим на 3-м занятии
 				</section>
 
 				<section>
