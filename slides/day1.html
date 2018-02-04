@@ -328,8 +328,53 @@ println(r.getOrElse("None"))
 				</section>
 
 				<section>
-					<h3>Try</h3>
-					TODO
+					<h3>Try[T]</h3>
+					Обработка исключений в Scala похожа на Java:
+					<pre><code class="scala">
+try {
+  1 / 0
+} catch {
+  case ex: ArithmeticException ⇒
+    println(ex.getMessage)
+}
+					</code></pre>
+				</section>
+
+				<section>
+					Иногда мы не хотим обрабатывать ошибки прямо сейчас:
+					<ul>
+						<li>хотим положить в список и потом обработать
+						<li>передать между потоками
+						<li>...
+					</ul>
+				</section>
+
+				<section>
+					<p>Тип Try
+					<ul>
+						<li>Success - содержит значение
+						<li>Failure - содержит исключение
+					</ul>
+
+					<p>получим его так:
+
+					<pre><code class="scala">val result: Try[Int] = Try {
+  1 / 0
+}					</code></pre>
+				</section>
+
+				<section>
+					<pre><code class="scala">
+import scala.util.{Random, Try}
+
+val vector = Vector.fill(10) {
+  Try {
+    1 / Random.nextInt(5)
+  }
+}
+
+vector.count(x ⇒ x.isSuccess)				
+					</code></pre>
 				</section>
 
 				<section>
