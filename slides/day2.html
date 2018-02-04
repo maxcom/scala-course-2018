@@ -38,6 +38,93 @@
 						<li>Практическая часть: пишем юнит-тесты
 					</ol>
 				</section>
+
+				<section>
+					<p>В функциональном программировании предпочитают
+					<ul>
+						<li>Чистые функции
+						<li>Неизменяемые (иммутабельные) данные
+					</ul>
+					<p>эти свойства делают код более предсказуемым, а программы - более надежными
+				</section>
+
+				<section>
+					Чистые функции:
+					<ul>
+						<li>являются детерминированными
+						<li>не обладают побочными эффектами
+					</ul>
+				</section>
+
+				<section>
+					Вычисление чистых функций
+					<ul>
+						<li>можно кешировать
+						<li>переупорядочивать и откладывать их выполнение (поговорим на 3-м занятии)
+						<li>передавать в другие потоки (поговорим на 5-м заняии)
+					</ul>
+				</section>
+
+				<section>
+					<pre><code class="scala">object UserRepository {
+  private val users: ListBuffer[String] = ListBuffer()
+
+  def checkPas(user: String, password: String): Boolean = ???
+  
+  def login(user: String, password: String): Unit = {
+    if (checkPass(user, password)) {
+      users += user
+    } else {
+      throw new BadPasswordException(user)
+    }
+  }
+
+  def getUsers(): ListBuffer[String] = users
+} </code></pre>
+					</section>
+					<section>
+					Проблема:
+					<pre><code class="scala">
+// oops!
+
+UserRepository.getUsers().append("hacker")
+					</code></pre>
+
+					аналогичная проблема с данными которые передают в наши функции
+				</section>
+
+				<section>
+					В Java такие проблемы обычно решают "защитными" копиями:
+
+					<pre><code class="scala">
+def getUsers(): Seq[String] = users.toVector
+					</code></pre>
+
+					В Scala это работает лучше, так как попытки модифицировать не компилируются
+				</section>
+
+				<section>
+					Но можно сразу работать с неизменяемыми данными:
+					<pre><code class="scala">
+object UserRepository {
+  private var users: Vector[String] = Vector.empty
+
+  def login(user: String, password: String): Unit = {
+    if (checkPasword(user, password)) {
+      users = users :+ user
+    } else {
+      throw new BadPasswordException(user)
+    }
+  }
+
+  def getUsers(): Seq[String] = users
+}
+					</code></pre>
+				</section>
+
+				<section>
+					эффективно ли это?
+				</section>
 			</div>
 
 		</div>
