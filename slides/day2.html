@@ -146,6 +146,20 @@ object UserRepository {
 					<a target="_blank" href="http://newstar.rinet.ru/~goga/sicp/sicp.pdf">Структура и интерпретация
 компьютерных программ</a>
 				</section>
+
+				<section>
+					<p>List - алгебраический тип с двумя вариантами:
+
+					<ul>
+						<li> ::(head, tail) - элемент списка, обычно называют "cons"
+						<li> Nil - пустой список
+					</ul>
+					<p>например:
+					<pre><code class="scala">
+val l: List[Int] = 1 :: 2 :: 3 :: Nil
+					</code></pre>
+					<p>(вычисляется справа налево)
+				</section>
 			</div>
 
 		</div>
