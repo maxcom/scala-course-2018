@@ -8,7 +8,7 @@ layout: default
 # Слайды
 
 * [Обзор курса](slides/index.html)
-* [Часть 1. Базовые типы Scala и pattern matching](slides/day1.html) - TODO
+* [Часть 1. Базовые типы Scala и pattern matching](slides/day1.html)
 * Часть 2. Иммутабельность и базовые структуры данных. Работа со списками.
 * Часть 3. Монады, ленивые вычисления и побочные эффекты.
 * Часть 4. Implict значения и преобразования.
