@@ -69,7 +69,7 @@
 					<pre><code class="scala">object UserRepository {
   private val users: ListBuffer[String] = ListBuffer()
 
-  def checkPas(user: String, password: String): Boolean = ???
+  def checkPass(user: String, password: String): Boolean = ???
   
   def login(user: String, password: String): Unit = {
     if (checkPass(user, password)) {
@@ -162,7 +162,48 @@ val l: List[Int] = 1 :: 2 :: 3 :: Nil
 				</section>
 
 				<section>
-					TODO: Добавление в голову и в хвост
+					Две "бесплатные" операции:
+					
+					<ul>
+						<li>Добавление в голову
+						<li>Декомпозиция на голову и хвост
+					</ul>
+				</section>
+
+				<section>
+					<p>Получение "хвоста" начиная с N-ного элемента:
+					<pre><code class="scala">
+def drop(list: List[Int], n: Int): List[Int] = {
+  if (n &gt; 0 &amp;&amp; list.nonEmpty) {
+    drop(list.tail, n - 1)
+  } else {
+    list
+  }
+}
+					</code></pre>
+				</section>
+
+				<section>
+					Получение элемента по индексу:
+
+					<pre><code class="scala">
+// упрощенная версия кода библиотеки Scala 2.12.4
+def apply(n: Int): Int = {
+  val rest = drop(n)
+
+  if (n < 0 || rest.isEmpty) 
+    throw new IndexOutOfBoundsException(n.toString)
+
+  rest.head
+}
+					</code></pre>
+
+					<p>количество операций пропорционально N
+				</section>
+				<section>
+					TODO: Добавление в хвост
+
+					<p>Добавление в хвост - только с созданием полной копии.
 				</section>
 
 				<section>
@@ -178,7 +219,15 @@ val l: List[Int] = 1 :: 2 :: 3 :: Nil
 				</section>
 
 				<section>
+					TODO: fold
+				</section>
+
+				<section>
 					TODO: страшилка с O(N^2)
+				</section>
+
+				<section>
+					TODO: Правда о List
 				</section>
 
 				<section>
