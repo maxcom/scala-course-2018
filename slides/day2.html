@@ -154,20 +154,21 @@ object UserRepository {
 						<li> ::(head, tail) - элемент списка, обычно называют "cons"
 						<li> Nil - пустой список
 					</ul>
-					<p>например:
-					<pre><code class="scala">
-val l: List[Int] = 1 :: 2 :: 3 :: Nil
-					</code></pre>
-					<p>(вычисляется справа налево)
 				</section>
 
 				<section>
-					Две "бесплатные" операции:
-					
-					<ul>
-						<li>Добавление в голову
-						<li>Декомпозиция на голову и хвост
-					</ul>
+					<p>например:
+					<div><img src="Cons-cells.svg" style="background: white; border: 0; padding: 1em"></div>
+					<pre><code class="scala">
+val l: List[Int] = 42 :: 69 :: 613 :: Nil
+					</code></pre>
+					<p>(вычисляется справа налево)
+					<p><small>* картинка Yonkeltron at English Wikipedia</small></p>
+				</section>
+
+				<section>
+					<p>Декомпозиция на голову и хвост - "бесплатная" операция.
+					<p>Её можно использовать для итерирования по элементам списка.
 				</section>
 
 				<section>
@@ -179,6 +180,21 @@ def drop(list: List[Int], n: Int): List[Int] = {
   } else {
     list
   }
+}
+					</code></pre>
+				</section>
+
+				<section>
+					Тут рекурсию можно заменить на цикл:
+					<pre><code class="scala">
+def dropLoop(list: List[Int], n: Int): List[Int] = {
+  var these = list
+  var count = n
+  while (these.nonEmpty &amp;&amp; count &gt; 0) {
+    these = these.tail
+    count -= 1
+  }
+  these
 }
 					</code></pre>
 				</section>
@@ -232,6 +248,8 @@ def apply(n: Int): Int = {
 
 				<section>
 					TODO: неэффективность List
+
+					Производительность коллекций: <a target="_blank" href="http://www.lihaoyi.com/post/BenchmarkingScalaCollections.html">Benchmarking Scala Collections</a>.
 				</section>
 
 				<section>
