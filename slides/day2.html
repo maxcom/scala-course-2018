@@ -207,7 +207,7 @@ def dropLoop(list: List[Int], n: Int): List[Int] = {
 def apply(n: Int): Int = {
   val rest = drop(n)
 
-  if (n < 0 || rest.isEmpty) 
+  if (n &lt; 0 || rest.isEmpty) 
     throw new IndexOutOfBoundsException(n.toString)
 
   rest.head
@@ -216,18 +216,90 @@ def apply(n: Int): Int = {
 
 					<p>количество операций пропорционально N
 				</section>
-				<section>
-					TODO: Добавление в хвост
 
+				<section>
+					Реверс списка:
+					<pre><code class="scala">
+def reverse(list: List[Int]): List[Int] = {
+  def rev(target: List[Int], remains: List[Int]): List[Int] = {
+    remains match {
+      case head :: tail ⇒
+        rev(head :: target, tail)
+      case Nil ⇒
+        target
+    }
+  }
+
+  rev(Nil, list)
+}
+
+					</code></pre>
+					<p>(легко можно заменить на цикл)<p>
+				</section>
+
+				<section>
 					<p>Добавление в хвост - только с созданием полной копии.
+					<pre><code class="scala">
+def append(list: List[Int], v: Int): List[Int] = {
+  list match {
+    case Nil ⇒ 
+      v :: Nil
+    case head :: tail ⇒
+      head :: append(tail, v)
+  }
+}
+					</code></pre>
+					<p>число операция пропорционально длине списка
 				</section>
 
 				<section>
-					TODO: конкатенация списков
+					<p>Проблемы этого кода:
+					<ul>
+						<li>Быстро переполняется стек
+						<li class="fragment">На цикл заменить нельзя 
+					</ul>
 				</section>
 
 				<section>
-					TODO: хвостовая рекурсия
+					<p>Как работает этот код?
+					<p class="fragment">Список копируется в стек
+					<p class="fragment">Стек раскручивается в новый список
+				</section>
+
+				<section>
+					Та же логика, но без стека:
+					<pre><code class="scala">
+def append(list: List[Int], v: Int): List[Int] = {
+  (v :: list.reverse).reverse
+}
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Хвостовая рекурсия — частный случай рекурсии, при котором любой рекурсивный вызов является последней операцией перед возвратом из функции.</p>
+					<p class="fragment">Хвостовая рекурсия автоматически заменяется на цикл компилятором
+					(в границах одного файла!)
+				</section>
+
+				<section>
+					<pre><code class="scala">
+@tailrec // опитимизация или ошибка
+def drop(list: List[Int], n: Int): List[Int] = {
+  if (n &gt; 0 &amp;&amp; list.nonEmpty) {
+    drop(list.tail, n - 1)
+  } else {
+    list
+  }
+}
+					</code></pre>
+				</section
+				>
+				<section>
+					TODO: страшилка с O(N^2)
+				</section>
+
+				<section>
+					TODO: Правда о List
 				</section>
 
 				<section>
@@ -236,14 +308,6 @@ def apply(n: Int): Int = {
 
 				<section>
 					TODO: fold
-				</section>
-
-				<section>
-					TODO: страшилка с O(N^2)
-				</section>
-
-				<section>
-					TODO: Правда о List
 				</section>
 
 				<section>
