@@ -33,9 +33,10 @@
 					<h3>План</h2>
 					<ol>
 						<li>Функциональный подход и иммутабельность. 
-						<li>Персистентные структуры данных. 
-						<li>Работа со списками; обзор стандартной библиотеки.  
-						<li>Практическая часть: пишем юнит-тесты
+						<li>Персистентные структуры данных на примере List.
+						<li>Работа со списками: "классика" и ListBuffer.
+						<li>filter, map и fold.
+						<li>Практическая часть: пишем юнит-тесты.
 					</ol>
 				</section>
 
@@ -66,6 +67,7 @@
 				</section>
 
 				<section>
+					<p>Сложности изменяемых данных
 					<pre><code class="scala">object UserRepository {
   private val users: ListBuffer[String] = ListBuffer()
 
@@ -292,18 +294,117 @@ def drop(list: List[Int], n: Int): List[Int] = {
   }
 }
 					</code></pre>
-				</section
-				>
-				<section>
-					TODO: страшилка с O(N^2)
 				</section>
 
 				<section>
-					TODO: Правда о List
+					<h2>filter</h2>
+
+					<p>Одна из "классических" функций: оставляет только элементы,
+					для которых верно условие фильтрации.</p>
+
+					<pre><code class="scala">
+// метод List[A] 					
+def filter(pred: A => Boolean): List[A]
+					</code></pre>
 				</section>
 
 				<section>
-					TODO: map и filter
+					<p>Пример использования - только четные числа:
+					<pre><code class="scala">
+val l: List[Int] = List.fill(10)(Random.nextInt(10))
+
+l.filter(_ % 2 == 0)					
+					</code></pre>
+				</section>
+
+				<section>
+					Простая реализация:
+					<pre><code class="scala">def filter(list: List[Int])(f: Int ⇒ Boolean): List[Int] = {
+  list match {
+    case head +: tail ⇒
+      if (f(head)) {
+        head +: filter(tail)(f)
+      } else {
+        filter(tail)(f)
+      }
+    case Nil ⇒ 
+      Nil
+  }
+}
+
+filter(l)(_ % 2 == 0) </code></pre>
+					<p><small>рекурсия не хвостовая, стек переполняется</small>
+				</section>
+
+				<section>
+					<p>Плохая идея</p>
+					<pre><code class="scala">
+def filter(list: List[Int])(f: Int ⇒ Boolean): List[Int] = {
+  def rec(list: List[Int], acc: List[Int]): List[Int] = {
+    list match {
+      case head +: tail if f(head) ⇒ rec(tail, acc :+ head)
+      case _ +: tail               ⇒ rec(tail, acc)
+      case Nil                     ⇒ acc
+    }
+  }
+
+  rec(list, Nil)
+}
+					</code></pre>
+					<p><small>Рекурсия хвостовая, но количество операций - пропорционально N*N</small>
+				</section>
+
+				<section>
+					<p>Время выполнения:
+					<ul>
+						<li>100 элементов ~ 1 ms
+						<li>1000 элементов ~ 2 ms
+						<li>10000 элементов ~ 93 ms
+						<li>100000 элементов ~ 11 секунд
+						<li>200000 элементов ~ 51 секунда
+					</ul>
+				</section>
+
+				<section>
+					Классическое решение - сборка списка в обратном порядке и reverse.	
+				</section>
+
+				<section>
+					List в библиотеке Scala - не совсем immutable:
+					<pre><code class="scala">
+final case class ::[B](override val head: B, 
+                       private[scala] var tl: List[B]) 
+		       extends List[B]
+					</code></pre>
+				</section>
+
+				<section>
+					<p>List позволено менять классу ListBuffer - "конструктору" списка.
+
+					<p class="fragment">В ListBuffer хранится приватный список, в который можно добавлять в конец.
+
+					<p class="fragment">Списки, полученные из ListBuffer никогда не меняются.
+				</section>
+
+				<section>
+					<pre><code class="scala">def filter(list: List[Int])(f: Int ⇒ Boolean): List[Int] = {
+  val builder = ListBuffer[Int]()
+  var current = list
+  
+  while (current.nonEmpty) {
+    if (f(current.head)) {
+      builder += current.head
+    }
+    
+    current = current.tail
+  }
+  
+  builder.toList
+} </code></pre>
+				</section>
+
+				<section>
+					TODO: map
 				</section>
 
 				<section>
@@ -317,19 +418,11 @@ def drop(list: List[Int], n: Int): List[Int] = {
 				</section>
 
 				<section>
-					TODO: Vector
-				</section>
-
-				<section>
-					TODO: Map и HashMap
+					TODO: задание (99 problems)
 				</section>
 
 				<section>
 					TODO: unit-тесты на specs2
-				</section>
-
-				<section>
-					TODO: задание (99 problems)
 				</section>
 			</div>
 
