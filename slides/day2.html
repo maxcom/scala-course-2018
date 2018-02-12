@@ -404,11 +404,29 @@ final case class ::[B](override val head: B,
 				</section>
 
 				<section>
-					TODO: map
+					<p>map - применяет функцию ко всем элементам списка
+
+					<pre><code class="scala">
+list.map(x ⇒ x * x)					
+					</code></pre>
+
+					<p>flatMap - аналогично, но возвращает список элементов
+
+					<pre><code class="scala">
+list.flatMap(x ⇒ List.fill(x)(Random.nextInt(10)))
+					</code></pre>
 				</section>
 
 				<section>
-					TODO: fold
+					<p>foldLeft - применяет функцию к начальному значению и элементам списка 
+					<pre><code class="scala">
+def foldLeft[B](z: B)(op: (B, A) =&gt; B): B
+					</code></pre>
+					<p>z - начальное значение
+				</section>
+
+				<section>
+					TODO: fold - схема применения и примеры
 				</section>
 
 				<section>
