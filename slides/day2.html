@@ -418,7 +418,7 @@ list.flatMap(x ⇒ List.fill(x)(Random.nextInt(10)))
 				</section>
 
 				<section>
-					<p>foldLeft - применяет функцию к начальному значению и элементам списка 
+					<p>foldLeft - применяет функцию к начальному значению и элементам списка последовательно
 					<pre><code class="scala">
 def foldLeft[B](z: B)(op: (B, A) =&gt; B): B
 					</code></pre>
@@ -426,13 +426,61 @@ def foldLeft[B](z: B)(op: (B, A) =&gt; B): B
 				</section>
 
 				<section>
-					TODO: fold - схема применения и примеры
+					<p>Сумма элементов списка:
+					<pre><code class="scala">
+list.foldLeft(0)(_ + _)
+					</code></pre>
+					<p class="fragment">отдельно функция:
+					<pre class="fragment"><code class="scala">
+def op(acc: Int, v: Int) = acc + v
+
+list.foldLeft(0)(op)
+					</code></pre>
 				</section>
 
 				<section>
-					TODO: неэффективность List
+					Применяется foldLeft вот так:
+					<pre><code class="scala">
+op(0, list(0))
 
-					Производительность коллекций: <a target="_blank" href="http://www.lihaoyi.com/post/BenchmarkingScalaCollections.html">Benchmarking Scala Collections</a>.
+op(op(0, list(0)), list(1))
+
+op(op(op(0, list(0)), list(1)), list(2))
+
+op(op(op(op(0, list(0)), list(1)), list(2)), list(3))
+
+...
+					</code></pre>
+				</section>
+
+				<section>
+					Пример: убираем повторяющиеся подряд элементы:
+					<pre><code class="scala">
+list.foldLeft(List.empty[Int]) { (acc, v) ⇒
+  if (acc.headOption.contains(v)) {
+    acc
+  } else {
+    v :: acc
+  }
+}.reverse					
+					</code></pre>
+				</section>
+
+				<section>
+					Неэффективность List:
+
+					<ul>
+						<li>Большая нагрузка на сборщик мусора
+						<li class="fragment">Большой overhead по памяти (в два раза больше массива)
+						<li class="fragment">Многие операции над списком O(N)
+					</ul>
+
+					<p class="fragment">
+					На 3-м занятии поговорим о других структурах данных
+				</section>
+				<section>
+					<p>Посмотрите на исследование
+					производительность коллекций Scala: <a target="_blank" href="http://www.lihaoyi.com/post/BenchmarkingScalaCollections.html">Benchmarking Scala Collections</a>.
 				</section>
 
 				<section>
