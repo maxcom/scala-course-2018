@@ -484,7 +484,19 @@ list.foldLeft(List.empty[Int]) { (acc, v) ⇒
 				</section>
 
 				<section>
-					TODO: задание (99 problems)
+					<p>Домашнее задание:
+					<p>Элементы списка произвольной длины сдигаем влево на N позиций, например:
+					<pre><code class="scala">
+val list = List('a', 'b', 'c', 'd', 'e', 'f', 
+                'g', 'h', 'i', 'j', 'k'))
+
+rotate(3, list)
+// List('d', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'a', 'b', 'c')
+
+rotate(-2, list)
+// List('j', 'k', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i')
+					</code></pre>
+					<p>Разрешено использовать только декомпозицию списка; сборку через ::; fold и reverse
 				</section>
 
 				<section>
