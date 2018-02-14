@@ -383,7 +383,7 @@ val result = value(Plus(Number(2), Number(2)))
 
 				<section>
 					<p>Pattern matching - альтернатива полиморфизму на методах:
-					<pre><code class="scala">sealed trait Expr {
+					<pre><code class="scala">trait Expr {
   def eval: Int
 }
 case class Number(value: Int) extends Expr {
@@ -396,6 +396,14 @@ case class Minus(lhs: Expr, rhs: Expr) extends Expr {
   override def eval = lhs.eval - rhs.eval
 }
 Plus(Number(2), Number(2)).eval</code></pre>
+				</section>
+
+				<section>
+					<p>Две модели:
+					<ol>
+						<li>Фиксированная "схема" данных, произвольные операции – PM
+						<li>Фиксированные операции, большое разнообразие объектов – ООП
+
 				</section>
 
 				<section>
