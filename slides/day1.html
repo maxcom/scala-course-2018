@@ -286,17 +286,44 @@ val (first, second) = v.splitAt(v.length / 2)
 
 				<section>
 					<h2>Case-классы</h2>
+					<p>Механизм для создания собственных типов для данных.
 					<pre><code class="scala">
 case class Address(`type`: String, value: String) {
   def toStringAddress = s"${`type`}:$value"
 }
 					</code></pre>
+					<p>Это не ООП! Данные не изменяемые, обычно не содержат бизнес-логики.
+				</section>
+
+				<section>
+					<p>Собственный тип лучше, чем просто значения:
+
+					<pre><code class="scala">Address(`type`, value)</code></pre> 
+				
+					<p>против пары
+
+					<pre><code class="scala">(String, String)</code></pre> 
+				</section>
+
+				<section>
+					<p>Собственный тип можно заводить и для простых значений,
+					   например:
+
+					<pre><code class="scala">case class UserId(uuid: UUID)</code></pre> 
+					<pre><code class="scala">case class GroupId(uuid: UUID)</code></pre> 
+
+					<p>типы позволяют не путать значения между собой
+				</section>
+
+				<section>
+					<p>Что есть в case class?
 					<ul>
-						<li class="fragment">геттеры для полей</li>
+						<li>геттеры для полей</li>
 						<li class="fragment">toString</li>
 						<li class="fragment">equals и hashcode</li>
 						<li class="fragment">создание без "new"</li>
 						<li class="fragment">экстрактор</li>
+						<li class="fragment">сериализация, product и еще...
 				</section>
 
 				<section>
