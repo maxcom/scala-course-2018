@@ -217,17 +217,31 @@ target          -- результат компиляции
 				</section>
 
 				<section>
+					<h2>Пара (tuple)</h2>
+
+					Комбинация из двух значений:
+					<pre><code class="scala">
+val pair: (Int, Int) = (1, 2)
+// Tuple2[Int, Int]
+					</code></pre>
+					<p>деконструкция</p>
+					<pre><code class="scala">
+val (first, second) = pair
+					</code></pre>
+					<p>бывают еще "тройки" и более - до 22
+				</section>
+
+				<section>
 					<h3>Немного о коллекциях</h3>
 
 					Подробно устройство коллекций рассмотрим на втором занятии.
 				</section>
 
 				<section>
-					<p>Seq[T] - общий тип для коллекций, имеющих определенный порядок
+					<p>Seq[T] – общий тип для коллекций, имеющих определенный порядок
 					   (списки, массивы, вектора и т.п.)
-					<p>ArrayBuffer[T] - аналог ArrayList из Java
-					<p>Vector[T] - неизменяемый аналог ArrayList
-					<p>List[T] - неизменяемый связный список
+					<p>ArrayBuffer[T] – аналог ArrayList из Java
+					<p>Vector[T] – неизменяемый аналог ArrayList
 				</section>
 
 				<section>
@@ -244,32 +258,8 @@ val f: (Int ⇒ Int) = buffer
 				</section>
 
 				<section>
-					неизменяемые коллекции интереснее:
-					<pre><code class="scala">
-val vector = Vector(2, 3, 4)
-
-// читаем слева направо 
-val v2: Vector[Int] = vector :+ 5 :+ 6
-  
-// читаем справа налево
-val v3: Vector[Int] = 0 +: 1 +: vector	
-val v4: Vector[Int] = 0 +: (1 +: vector)
-					</code></pre>
-				</section>
-
-				<section>
-					<h2>Пара (tuple)</h2>
-
-					Комбинация из двух значений:
-					<pre><code class="scala">
-val pair: (Int, Int) = (1, 2)
-// Tuple2[Int, Int]
-					</code></pre>
-					<p>деконструкция</p>
-					<pre><code class="scala">
-val (first, second) = pair
-					</code></pre>
-					<p>бывают еще "тройки" и более - до 22
+					<p>У стандатных коллекция много полезных функций
+					<p>Справка на Vector: <a target="_blank" href="http://www.scala-lang.org/api/2.12.4/scala/collection/immutable/Vector.html">scaladoc</a>.
 				</section>
 
 				<section>
@@ -440,11 +430,14 @@ if (r.isDefined) {
 				<section>
 					несколько правильных вариантов:
 					<pre><code class="scala">
+// 1
 r match {
   case Some(k) ⇒ println(k)
   case None    ⇒ println("None")  
 }
 
+// 
+// 2
 println(r.getOrElse("None"))
 					</code></pre>
 					еще варианты рассмотрим на 3-м занятии
@@ -490,6 +483,7 @@ try {
 					<pre><code class="scala">
 import scala.util.{Random, Try}
 
+// fill - функция с двумя блоками параметров
 val vector = Vector.fill(10) {
   Try {
     1 / Random.nextInt(5)
@@ -514,41 +508,7 @@ vector.count(x ⇒ x.isSuccess)
 						<li>Left(y) - "левое" значение
 					</ul>
 				</section>
-
-				<section>
-					<h2>Pattern matching для списков</h2>
-					<pre><code class="scala">
-val list = List(1, 2, 3, 4, 5)
-val list2 = 1 +: 2 +: 3 +: 4 +: 5 +: Nil
-
-list match {
-  case Seq()    ⇒ "empty"
-  case Seq(one) ⇒ s"only one element $one"
-  case one +: _ ⇒ s"at least one element $one"  
-}
-					</code></pre>
-				</section>
-
-				<section>
-					Pattern matching с условиями
-
-					<pre><code class="scala">
-val list = List(1, 2, 3, 4, 5)
-
-list match {
-  // второй элемент 10; выкинем его   
-  case head +: 10 +: tail ⇒
-    head +: tail
-  // первый элемент четный, выкинем его  
-  case head +: tail if head % 2 == 0 ⇒
-    tail
-  // не падаем на других вариантах  
-  case other ⇒
-    other
-}					
-					</code></pre>
-				</section>
-
+				
 				<section>
 					<h2>Домашнее задание</h2>
 
@@ -556,7 +516,6 @@ list match {
 
 					<p>Описание алгоритма: <a target="_blank" href="https://ru.wikipedia.org/wiki/%D0%A1%D0%BE%D1%80%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D0%B0_%D1%81%D0%BB%D0%B8%D1%8F%D0%BD%D0%B8%D0%B5%D0%BC">на wikipedia</a> 
 					<p>Неплохая <a target="_blank" href="https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html">визуализация</a><br> (надо выбрать "merge sort")
-					<p>Справка на Vector: <a target="_blank" href="http://www.scala-lang.org/api/2.12.4/scala/collection/immutable/Vector.html">scaladoc</a>.
 				</section>
 			</div>
 

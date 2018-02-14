@@ -163,14 +163,59 @@ object UserRepository {
 					<div><img src="Cons-cells.svg" style="background: white; border: 0; padding: 1em"></div>
 					<pre><code class="scala">
 val l: List[Int] = 42 :: 69 :: 613 :: Nil
+// для удобства есть конструктор List(42, 69, 613)
 					</code></pre>
 					<p>(вычисляется справа налево)
 					<p><small>* картинка Yonkeltron at English Wikipedia</small></p>
 				</section>
 
 				<section>
-					<p>Декомпозиция на голову и хвост - "бесплатная" операция.
-					<p>Её можно использовать для итерирования по элементам списка.
+					<p>Декомпозиция на голову и хвост – "бесплатная" операция.
+					<p>Плохой (но популярный) способ:
+
+					<pre><code class="scala">
+val l: List[Int] = 42 :: 69 :: 613 :: Nil
+
+if (l.nonEmpty) {
+  println(l.head) // 42
+  println(l.tail) // List(69, 613)
+}		
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Используем pattern matching:
+					<pre><code class="scala">
+l match {
+  case head :: tail ⇒ // head +: tail
+    println(head)
+    println(tail)
+  case Nil ⇒         // Seq()
+    println("empty")
+}
+					</code></pre>
+				</section>
+
+				<section>
+					Работают и более сложные варианты:
+					<pre><code class="scala">
+l match {
+  // через конструктор - точное число элементов
+  case Seq(one) ⇒
+     s"exactly $one"
+  // как минимум один элемент
+  case one +: _ ⇒ 
+    s"at least one element $one"
+  // второй элемент 10; выкинем его и преобразуем в строку
+  case head +: 10 +: tail ⇒
+    (head +: tail).mkString
+}
+					</code></pre>
+
+				</section>
+				<section>
+					<p>Декомпозицию можно использовать для итерирования 
+					по элементам списка.
 				</section>
 
 				<section>
