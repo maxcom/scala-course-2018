@@ -371,8 +371,7 @@ case class Minus(lhs: Expr, rhs: Expr) extends Expr
 
 				<section>
 					<h2>Pattern matching</h2>
-					<pre><code class="scala">
-def value(expression: Expr): Int = expression match {
+					<pre><code class="scala">def value(expression: Expr): Int = expression match {
   case Number(value)   ⇒ value
   case Plus(lhs, rhs)  ⇒ value(lhs) + value(rhs)
   case Minus(lhs, rhs) ⇒ value(lhs) - value(rhs)
@@ -380,6 +379,23 @@ def value(expression: Expr): Int = expression match {
 
 val result = value(Plus(Number(2), Number(2)))
 					</code></pre>
+				</section>
+
+				<section>
+					<p>Pattern matching - альтернатива полиморфизму на методах:
+					<pre><code class="scala">sealed trait Expr {
+  def eval: Int
+}
+case class Number(value: Int) extends Expr {
+  override val eval = value
+}
+case class Plus(lhs: Expr, rhs: Expr) extends Expr {
+  override def eval = lhs.eval + rhs.eval
+}
+case class Minus(lhs: Expr, rhs: Expr) extends Expr {
+  override def eval = lhs.eval - rhs.eval
+}
+Plus(Number(2), Number(2)).eval</code></pre>
 				</section>
 
 				<section>
