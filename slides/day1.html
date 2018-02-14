@@ -209,6 +209,21 @@ target          -- результат компиляции
 				</section>
 
 				<section>
+					<p>В Scala почти всё является выражением:
+					<pre><code class="scala">
+val ageGroup = if (age &gt;= 18) "grownup" else "minor"
+					</code></pre>
+					<pre><code class="scala">
+val result: Int = {
+  val one = 1
+  val two = 2
+  
+  one + two // "возвращается" последнее значение в блоке
+}
+					</code></pre>
+				</section>
+
+				<section>
 					объявление функции:
 					<pre><code class="scala">def square(x: Int) = x * x</code></pre>
 					функция - это значение:
