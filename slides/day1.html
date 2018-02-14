@@ -484,6 +484,7 @@ try {
 import scala.util.{Random, Try}
 
 // fill - функция с двумя блоками параметров
+// fill[A](n : Int)(elem : =&gt; A)
 val vector = Vector.fill(10) {
   Try {
     1 / Random.nextInt(5)
