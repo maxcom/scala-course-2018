@@ -455,6 +455,11 @@ final case class ::[B](override val head: B,
 list.map(x ⇒ x * x)					
 					</code></pre>
 
+					<p>TODO: пример использования map
+				</section>
+
+				<section>
+					<p>TODO: flatten
 					<p>flatMap - аналогично, но возвращает список элементов
 
 					<pre><code class="scala">
@@ -512,6 +517,10 @@ list.foldLeft(List.empty[Int]) { (acc, v) ⇒
 				</section>
 
 				<section>
+					TODO: пример реализации count - рекурсия и с использованием foldLeft
+				</section>
+
+				<section>
 					Неэффективность List:
 
 					<ul>
@@ -545,7 +554,11 @@ rotate(-2, list)
 				</section>
 
 				<section>
-					TODO: unit-тесты на specs2
+					<p>TODO: дополнительная часть - иммутабельная очередь: устройство, производительность
+				</section>
+
+				<section>
+					<p>TODO: операции map/filter/flatMap у Option; совместное использование Option и List
 				</section>
 			</div>
 
