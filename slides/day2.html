@@ -219,6 +219,22 @@ l match {
 				</section>
 
 				<section>
+					<p>Сумма элементов списка
+					<pre><code class="scala">
+def sum(list: List[Int]): Int = {
+  list match {
+    case Nil ⇒ 
+      0
+    case head :: tail ⇒
+      head + sum(tail)
+  }
+}
+					</code></pre>
+					<p>сборщик мусора собирает список прямо в процессе итерации
+					(если на него нет ссылок)
+				</section>
+
+				<section>
 					<p>Получение "хвоста" начиная с N-ного элемента:
 					<pre><code class="scala">
 def drop(list: List[Int], n: Int): List[Int] = {
@@ -349,7 +365,7 @@ def drop(list: List[Int], n: Int): List[Int] = {
 
 					<pre><code class="scala">
 // метод List[A] 					
-def filter(pred: A => Boolean): List[A]
+def filter(pred: A =&gt; Boolean): List[A]
 					</code></pre>
 				</section>
 
@@ -411,16 +427,21 @@ def filter(list: List[Int])(f: Int ⇒ Boolean): List[Int] = {
 				</section>
 
 				<section>
-					Классическое решение - сборка списка в обратном порядке и reverse.	
+					<p>Классическое решение - сборка списка в обратном порядке и reverse.
+
+					<p class="fragment">Но в стандартной библиотеке Scala (и многих других) код оптимизирован.
 				</section>
 
 				<section>
-					List в библиотеке Scala - не совсем immutable:
+					<p>List в библиотеке Scala - не совсем immutable:
 					<pre><code class="scala">
 final case class ::[B](override val head: B, 
                        private[scala] var tl: List[B]) 
 		       extends List[B]
 					</code></pre>
+
+					<p class="fragment">Однако, для пользовательского кода
+					все гарантии сохранены.
 				</section>
 
 				<section>
@@ -444,7 +465,7 @@ final case class ::[B](override val head: B,
     current = current.tail
   }
   
-  builder.toList
+  builder.toList // после список уже никогда не изменится
 } </code></pre>
 				</section>
 
@@ -455,21 +476,64 @@ final case class ::[B](override val head: B,
 list.map(x ⇒ x * x)					
 					</code></pre>
 
-					<p>TODO: пример использования map
+					<p>можно указать готовую функцию:
+					<pre><code class="scala">
+list.map(Math.sqrt) // для List[Double]
+					</code></pre>
 				</section>
 
 				<section>
-					<p>TODO: flatten
-					<p>flatMap - аналогично, но возвращает список элементов
+					<p>Повторяем каждый элемент списка два раза:
+					<pre><code class="scala">
+val list = List(1, 2, 3)
+
+list.map(x ⇒ List.fill(2)(x))
+// List[List[Int]] = List(List(1, 1), List(2, 2), List(3, 3))
+					</code></pre>
+				</section>
+
+				<section>
+					<p>flatten - превращаем список списков в плоский:
+					<pre><code class="scala">
+val list = List(1, 2, 3)
+
+list.map(x ⇒ List.fill(2)(x)).flatten
+// List(1, 1, 2, 2, 3, 3)
+					</code></pre>
+				</section>
+
+				<section>
+					<p>flatMap - комбинация map и flatten
 
 					<pre><code class="scala">
-list.flatMap(x ⇒ List.fill(x)(Random.nextInt(10)))
+list.flatMap(x ⇒ List.fill(2)(x))
 					</code></pre>
-					<p>TODO: пример с каррингом
 				</section>
 
 				<section>
-					TODO: collect - совмещаем map, filter и pattern matching
+					<p>Как превратить List[Option[Int]] в List[Int]?
+				</section>
+
+				<section>
+					<p>Плохой способ:
+					<pre><code class="scala">
+val list = List(Some(1), None, Some(3))
+
+list.filter(_.isDefined).map(_.get)
+					</code></pre>
+					<p>Option.get - источник ошибок	
+				</section>
+
+				<section>
+					<p>collect - совмещаем map, filter и pattern matching
+					<pre><code class="scala">
+val list = List(Some(1), None, Some(3))
+
+list collect {
+  // определяем только интересные паттерны
+  case Some(v) ⇒ v
+}
+					</code></pre>
 				</section>
 
 				<section>
@@ -522,7 +586,39 @@ list.foldLeft(List.empty[Int]) { (acc, v) ⇒
 				</section>
 
 				<section>
-					TODO: пример реализации count - рекурсия и с использованием foldLeft
+					<p>Пример: функция count
+
+					<pre><code class="scala">
+val list = List.fill(1000)(Random.nextInt(100))
+
+list.count(_ &gt; 50)
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Реализация через filter:
+
+					<pre><code class="scala">
+def count(list: List[Int], f: Int ⇒ Boolean): Int = 
+  list.filter(f).length
+					</code></pre>
+					<p><small>Не эффективно, создает временный список</small>
+				</section>
+
+				<section>
+					<p>Через foldLeft:
+					<pre><code class="scala">
+def count(list: List[Int], f: Int ⇒ Boolean): Int = {
+  list.foldLeft(0) { (acc, v) ⇒
+    if (f(v)) {
+      acc + 1
+    } else {
+      acc
+    }
+  }
+}
+					</code></pre>
+					<p><small>еще можно реализовать рекурсивным обходом списка</small>
 				</section>
 
 				<section>
@@ -556,6 +652,10 @@ rotate(-2, list)
 // List('j', 'k', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i')
 					</code></pre>
 					<p>Разрешено использовать только декомпозицию списка; сборку через ::; fold и reverse
+				</section>
+
+				<section>
+					<p>Не забываем про тесты!
 				</section>
 
 				<section>
