@@ -704,6 +704,83 @@ val sudoku: List[List[Int]] = List(
 				</section>
 
 				<section>
+					<h2>NonEmptyList<sup>*</sup></h2>
+					<p><small>дополнительная часть, если успеем</small>
+				</section>
+
+				<section>
+					<p>Специальный тип, реализованный в библиотеках Cats, Scalaz и др.
+
+					<pre><code class="scala">
+  // код библиотеки Cats
+  final case class NonEmptyList[+A](head: A, tail: List[A]) 
+    extends Product with Serializable 
+					</code></pre>
+					<p><small>Специальная головная ячейка списка</small>
+				</section>
+
+				<section>
+					<p>Функции которые увеличивают или не меняют длину возвращают NonEmptyList
+					<p>Остальные возвращают List
+					<p class="fragment">Стандартный список мог бы быть таким же, но разработчики
+					специально упростили его тип
+				</section>
+
+				<section>
+					Пример:
+
+					<pre><code class="scala">
+import cats.data.NonEmptyList
+
+val list: NonEmptyList[Int] =  NonEmptyList.of(1, 2, 3, 4)
+
+val list2: NonEmptyList[Int] = list.map(_ * 2)
+
+val list3: List[Int] = list.tail
+					</code></pre>
+				</section>
+
+				<section>
+					<p>зачем?
+				</section>
+
+				<section>
+					<p>Например делаем обработчик данных веб-форм на сайте
+					<div class="fragment">
+					<p>Простой вариант - функция 
+					<pre><code class="scala">
+def process(request: Request): Result
+					</code></pre>
+					<p>При ошибках - бросаем исключение
+					</div>
+				</section>
+
+				<section>
+					<p>Некорректный ввод - не исключение
+					<pre><code class="scala">
+def process(request: Request): Either[ValidationError, Result]
+					</code></pre>
+					<div class="fragment">
+						<p>Много полей - много разных ошибок
+						<pre><code class="scala">
+def process(request: Request): 
+  Either[List[ValidationError], Result]
+						</code></pre>
+					</div>
+				</section>
+
+				<section>
+					<p>Что делать если обработчик вернул Left[Nil]?
+					<div class="fragment">
+						<pre><code class="scala">
+def process(request: Request): 
+  Either[NonEmptyList[ValidationError], Result]
+						</code></pre>
+						<p><small>Избегаем ошибки при помощи более точного типа</small>
+					</div>
+				</section>
+
+				<section>
 					<p>TODO: дополнительная часть - иммутабельная очередь: устройство, производительность
 				</section>
 
