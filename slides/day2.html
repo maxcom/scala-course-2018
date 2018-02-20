@@ -639,7 +639,7 @@ def count(list: List[Int], f: Int ⇒ Boolean): Int = {
 				</section>
 
 				<section>
-					<p>Домашнее задание:
+					<p>Домашнее задание (1/3):
 					<p>Элементы списка произвольной длины сдигаем влево на N позиций, например:
 					<pre><code class="scala">
 val list = List('a', 'b', 'c', 'd', 'e', 'f', 
@@ -652,6 +652,51 @@ rotate(-2, list)
 // List('j', 'k', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i')
 					</code></pre>
 					<p>Разрешено использовать только декомпозицию списка; сборку через ::; fold и reverse
+				</section>
+
+				<section>
+					<p>Домашнее задание (2/3):
+					<p>Реализуем две стандартные функции:
+					<pre><code class="scala">
+// проверяем существование элемента, удовлетворяющего условию
+def exists(list: List[Int], f: Int ⇒ Boolean): Boolean = ???
+
+// проверяет что все элементы удовлетворяют условию
+def forall(list: List[Int], f: Int ⇒ Boolean): Boolean = ???
+					</code></pre>
+					<p>"Short-circuit evaluation" - вычисляем пока не получен результат.
+					<p>Одну функцию реализуем хвостовой рекурсией, вторую - циклом.
+				</section>
+
+				<section>
+					<p>Домашнее задание (3/3):
+					<p>Проверка корректности решения Судоку - головоломки с числами.
+				</section>
+
+				<section>
+					<img src="sudoku1.svg">
+				</section>
+
+				<section>
+					<img src="sudoku2.svg">
+				</section>
+
+				<section>
+					<p>поле представлено списком списков
+					<pre><code class="scala">
+val sudoku: List[List[Int]] = List(
+  List(1, 2, 3, 4, 5, 6, 7, 8, 9),
+  List(4, 5, 6, 7, 8, 9, 1, 2, 3),
+  List(7, 8, 9, 1, 2, 3, 4, 5, 6),
+  List(2, 3, 4, 5, 6, 7, 8, 9, 1),
+  List(5, 6, 7, 8, 9, 1, 2, 3, 4),
+  List(8, 9, 1, 2, 3, 4, 5, 6, 7),
+  List(3, 4, 5, 6, 7, 8, 9, 1, 2),
+  List(6, 7, 8, 9, 1, 2, 3, 4, 5),
+  List(9, 1, 2, 3, 4, 5, 6, 7, 8)
+)
+					</code></pre>
+					<p>Можно пользоваться любыми функциями библиотеки.
 				</section>
 
 				<section>
