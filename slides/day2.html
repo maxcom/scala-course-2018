@@ -139,6 +139,8 @@ object UserRepository {
 
 					<p>Структура стала популярной благодаря языку Lisp
 
+					<p class="fragment">Используется в Ocaml, Haskell, Erlang и др.
+
 					<p class="fragment">Хороша для обучения, не слишком эффективна на практике
 				</section>
 
@@ -851,7 +853,34 @@ def dequeue: (A, Queue[A]) = out match {
 				</section>
 
 				<section>
-					<p>TODO: операции map/filter/flatMap у Option; совместное использование Option и List
+					<h3>Операции map/filter/flatMap у Option<sup>*</sup></h3>
+					<p><small>дополнительная часть, если успеем</small>
+				</section>
+
+				<section>
+					<p>Option напоминает коллекцию, которая или пустая, или содержит один элемент
+				</section>
+
+				<section>
+					<pre><code class="scala">
+val v: Option[Int] = Some(11)
+
+v.filter(_ &gt; 5) // Some(11)
+v.map(_ * 2) // Some(22)
+					</code></pre>
+				</section>
+
+				<section>
+					<pre><code class="scala">
+val users = List(1 -&gt; "Petya", 11 -&gt; "Vasya", 23 -&gt; "Ivan")
+v.flatMap(id ⇒ users.find(_._1 == id)).map(_._2)
+// Some("Vasya")
+					</code></pre>
+
+					<pre class="fragment"><code class="scala">
+val usersMap = Map(1 -&gt; "Petya", 11 -&gt; "Vasya", 23 -&gt; "Ivan")
+v.flatMap(usersMap.get)
+					</code></pre>
 				</section>
 			</div>
 
