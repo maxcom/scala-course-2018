@@ -781,7 +781,73 @@ def process(request: Request):
 				</section>
 
 				<section>
-					<p>TODO: дополнительная часть - иммутабельная очередь: устройство, производительность
+					<h3>Неизменяемая очередь: устройство и производительность<sup>*</sup></h3>
+					<p><small>дополнительная часть, если успеем</small>
+				</section>
+
+				<section>
+					<p>У очереди две стандартные операции:
+					<ul>
+						<li>Добавить элемент в конец очереди
+						<li>Извлечь первый элемент из очереди
+					</ul>
+				</section>
+
+				<section>
+					<p>Очередь не изменяемая, помещаем в неё элемент:
+					<pre><code class="scala">
+import scala.collection.immutable.Queue
+
+var queue = Queue[String]()
+
+queue = queue.enqueue("first")
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Обрабатываем элементы
+					<pre><code class="scala">
+val (next, nextQueueValue) = queue.dequeue
+// process(next) - вариант 1
+queue = nextQueueValue
+// process(next) - вариант 2					
+					</code></pre>
+					<p class="fragment">Вопрос: в чем разница?
+				</section>
+
+				<section>
+					<p>Как это работает? List не подходит
+				</section>
+
+				<section>
+					<p>Два приватных списка:
+					<ul>
+						<li>in - для добавления
+						<li>out - для извлечения
+					</ul>
+				</section>
+
+				<section>
+					<pre><code class="scala">
+// переформатированный код библиотеки Scala 2.12.4
+def dequeue: (A, Queue[A]) = out match {
+  case Nil if !in.isEmpty =&gt; 
+    val rev = in.reverse 
+    (rev.head, new Queue(Nil, rev.tail))
+  case x :: xs =&gt; 
+    (x, new Queue(in, xs))
+  case _ =&gt; 
+    throw new NoSuchElementException("dequeue on empty queue")
+}
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Проблемы immutable Queue:
+					<ul>
+						<li>Производительность ниже чем у mutable
+						<li>Иногда плохое время отклика
+					</ul>
 				</section>
 
 				<section>
