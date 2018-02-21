@@ -62,7 +62,7 @@
 					<ul>
 						<li>можно кешировать
 						<li>переупорядочивать и откладывать их выполнение (поговорим на 3-м занятии)
-						<li>передавать в другие потоки (поговорим на 5-м заняии)
+						<li>передавать в другие потоки (поговорим на 5-м занятии)
 					</ul>
 				</section>
 
@@ -169,6 +169,16 @@ val l: List[Int] = 42 :: 69 :: 613 :: Nil
 					</code></pre>
 					<p>(вычисляется справа налево)
 					<p><small>* картинка Yonkeltron at English Wikipedia</small></p>
+				</section>
+
+				<section>
+					<p>Два разных списка разделяют общий "хвост"
+					<pre><code class="scala">
+val list = 5 :: 4 :: 3 :: 2 :: 1 :: Nil
+
+val list2 = 10 :: list
+val list3 = 20 :: list
+					</code></pre>
 				</section>
 
 				<section>
@@ -382,27 +392,24 @@ l.filter(_ % 2 == 0)
 
 				<section>
 					Простая реализация:
-					<pre><code class="scala">def filter(list: List[Int])(f: Int ⇒ Boolean): List[Int] = {
+					<pre><code class="scala">
+def filter(list: List[Int], f: Int ⇒ Boolean): List[Int] = {
   list match {
-    case head +: tail ⇒
-      if (f(head)) {
-        head +: filter(tail)(f)
-      } else {
-        filter(tail)(f)
-      }
-    case Nil ⇒ 
-      Nil
+    case head +: tail if f(head) ⇒ head +: filter(tail, f)
+    case _ +: tail               ⇒ filter(tail, f)
+    case Nil                     ⇒ Nil
   }
 }
 
-filter(l)(_ % 2 == 0) </code></pre>
+filter(list, _ % 2 == 0)					
+					</code></pre>
 					<p><small>рекурсия не хвостовая, стек переполняется</small>
 				</section>
 
 				<section>
 					<p>Плохая идея</p>
 					<pre><code class="scala">
-def filter(list: List[Int])(f: Int ⇒ Boolean): List[Int] = {
+def filter(list: List[Int], f: Int ⇒ Boolean): List[Int] = {
   def rec(list: List[Int], acc: List[Int]): List[Int] = {
     list match {
       case head +: tail if f(head) ⇒ rec(tail, acc :+ head)
@@ -876,11 +883,12 @@ val users = List(1 -&gt; "Petya", 11 -&gt; "Vasya", 23 -&gt; "Ivan")
 v.flatMap(id ⇒ users.find(_._1 == id)).map(_._2)
 // Some("Vasya")
 					</code></pre>
-
-					<pre class="fragment"><code class="scala">
+					<div class="fragment"><p>С следующий раз поговорим о хеш-таблицах
+					<pre><code class="scala">
 val usersMap = Map(1 -&gt; "Petya", 11 -&gt; "Vasya", 23 -&gt; "Ivan")
 v.flatMap(usersMap.get)
 					</code></pre>
+					</div>
 				</section>
 			</div>
 
