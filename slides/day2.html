@@ -390,7 +390,7 @@ def append(list: List[Int], v: Int): List[Int] = {
 
 				<section>
 					<pre><code class="scala">
-@tailrec // опитимизация или ошибка
+@tailrec // оптимизация или ошибка
 def drop(list: List[Int], n: Int): List[Int] = {
   if (n &gt; 0 &amp;&amp; list.nonEmpty) {
     drop(list.tail, n - 1)
