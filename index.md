@@ -21,6 +21,10 @@ layout: default
 * Часть 11. Финальное практическое задание. 3 мая.
 * Часть 12. Подводим итоги и разбор заданий. 10 мая.
 
+# Проверка домашних заданий
+
+* [Результаты проверки домашних заданий](https://docs.google.com/spreadsheets/d/1N9J-5koTlKMN2bpXkREhHM7Y1WyjD2zuoysjpxezlvM/)
+
 # Материалы для большого задания
 
 * Денис Баженов: [Наивный байесовский классификатор](http://bazhenov.me/blog/2012/06/11/naive-bayes.html) ([сохраненная копия сайта](https://github.com/maxcom/bazhenov.github.com))
