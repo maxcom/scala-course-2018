@@ -32,12 +32,66 @@
 				<section>
 					<h3>План</h2>
 					<ol>
+						<li>Орг. вопросы
+						<li>Обзор большого практического задания
 						<li>Функциональный подход и иммутабельность. 
 						<li>Персистентные структуры данных на примере List.
 						<li>Работа со списками: "классика" и ListBuffer.
 						<li>filter, map и fold.
 						<li>Практическая часть: пишем юнит-тесты.
 					</ol>
+				</section>
+
+				<section>
+					<p>План поменяем, чтобы успеть к 20 апреля.
+				</section>
+
+				<section>
+					<p>Критерии для получения зачета<br> (нужно выполнить все):
+					<ul>
+						<li>Посещение более 50% занятий<br>(отмечаем посещения!)
+						<li>Сделано более 50% домашних заданий
+						<li>Сделано практическое задание - реализован базовый функционал
+					</ul>
+				</section>
+
+				<section>
+					Критерии оценки:
+					<ul>
+						<li>5 - Посещение более 75% занятий; 100% домашних заданий; практическое задание реализовано в полном объеме
+						<li>4 - Посещение более 75% занятий; 100% домашних заданий; практическое задание не стабильно или не в полном объеме
+						<li>3 - Посещение более 50% занятий; 50% домашних заданий; минимальный функционал практического задания
+					</ul>
+				</section>
+
+				<section>
+					<p>Практическое задание - разработка сервиса эмоциональной оценки текстов
+					соц. сетей
+					<ol>
+						<li>Классификатор текстов (мат. обучение) <sup>*</sup>
+						<li>Сервис для оценки произвольного текста <sup>*</sup>
+						<li>Оценка сообщений соц. сетей <sup>*</sup>
+						<li>Отслеживание новых записей и история оценок
+						<li>Хранение состояния на диске; отказоустойчивость
+						<li>Реактивное обновление интерфейса при изменениях
+					</ol>
+					<p>* - "минимальный" функционал
+				</section>
+
+				<section>
+					<p>Реализацию начнем на следующем занятии
+				</section>
+
+				<section>
+					<p>TODO: типовые проблемы из решений ДЗ
+				</section>
+
+				<section>
+					<p>Еще у нас будет стажерская программа
+				</section>
+
+				<section>
+					<h2>Функциональный подход и иммутабельность. </h2>
 				</section>
 
 				<section>
@@ -62,7 +116,7 @@
 					<ul>
 						<li>можно кешировать
 						<li>переупорядочивать и откладывать их выполнение (поговорим на 3-м занятии)
-						<li>передавать в другие потоки (поговорим на 5-м заняии)
+						<li>передавать в другие потоки (поговорим на 5-м занятии)
 					</ul>
 				</section>
 
@@ -139,6 +193,8 @@ object UserRepository {
 
 					<p>Структура стала популярной благодаря языку Lisp
 
+					<p class="fragment">Используется в Ocaml, Haskell, Erlang и др.
+
 					<p class="fragment">Хороша для обучения, не слишком эффективна на практике
 				</section>
 
@@ -167,6 +223,16 @@ val l: List[Int] = 42 :: 69 :: 613 :: Nil
 					</code></pre>
 					<p>(вычисляется справа налево)
 					<p><small>* картинка Yonkeltron at English Wikipedia</small></p>
+				</section>
+
+				<section>
+					<p>Два разных списка разделяют общий "хвост"
+					<pre><code class="scala">
+val list = 5 :: 4 :: 3 :: 2 :: 1 :: Nil
+
+val list2 = 10 :: list
+val list3 = 20 :: list
+					</code></pre>
 				</section>
 
 				<section>
@@ -216,6 +282,22 @@ l match {
 				<section>
 					<p>Декомпозицию можно использовать для итерирования 
 					по элементам списка.
+				</section>
+
+				<section>
+					<p>Сумма элементов списка
+					<pre><code class="scala">
+def sum(list: List[Int]): Int = {
+  list match {
+    case Nil ⇒ 
+      0
+    case head :: tail ⇒
+      head + sum(tail)
+  }
+}
+					</code></pre>
+					<p>сборщик мусора собирает список прямо в процессе итерации
+					(если на него нет ссылок)
 				</section>
 
 				<section>
@@ -330,7 +412,7 @@ def append(list: List[Int], v: Int): List[Int] = {
 
 				<section>
 					<pre><code class="scala">
-@tailrec // опитимизация или ошибка
+@tailrec // оптимизация или ошибка
 def drop(list: List[Int], n: Int): List[Int] = {
   if (n &gt; 0 &amp;&amp; list.nonEmpty) {
     drop(list.tail, n - 1)
@@ -349,7 +431,7 @@ def drop(list: List[Int], n: Int): List[Int] = {
 
 					<pre><code class="scala">
 // метод List[A] 					
-def filter(pred: A => Boolean): List[A]
+def filter(pred: A =&gt; Boolean): List[A]
 					</code></pre>
 				</section>
 
@@ -364,27 +446,24 @@ l.filter(_ % 2 == 0)
 
 				<section>
 					Простая реализация:
-					<pre><code class="scala">def filter(list: List[Int])(f: Int ⇒ Boolean): List[Int] = {
+					<pre><code class="scala">
+def filter(list: List[Int], f: Int ⇒ Boolean): List[Int] = {
   list match {
-    case head +: tail ⇒
-      if (f(head)) {
-        head +: filter(tail)(f)
-      } else {
-        filter(tail)(f)
-      }
-    case Nil ⇒ 
-      Nil
+    case head +: tail if f(head) ⇒ head +: filter(tail, f)
+    case _ +: tail               ⇒ filter(tail, f)
+    case Nil                     ⇒ Nil
   }
 }
 
-filter(l)(_ % 2 == 0) </code></pre>
+filter(list, _ % 2 == 0)					
+					</code></pre>
 					<p><small>рекурсия не хвостовая, стек переполняется</small>
 				</section>
 
 				<section>
 					<p>Плохая идея</p>
 					<pre><code class="scala">
-def filter(list: List[Int])(f: Int ⇒ Boolean): List[Int] = {
+def filter(list: List[Int], f: Int ⇒ Boolean): List[Int] = {
   def rec(list: List[Int], acc: List[Int]): List[Int] = {
     list match {
       case head +: tail if f(head) ⇒ rec(tail, acc :+ head)
@@ -411,16 +490,21 @@ def filter(list: List[Int])(f: Int ⇒ Boolean): List[Int] = {
 				</section>
 
 				<section>
-					Классическое решение - сборка списка в обратном порядке и reverse.	
+					<p>Классическое решение - сборка списка в обратном порядке и reverse.
+
+					<p class="fragment">Но в стандартной библиотеке Scala (и многих других) код оптимизирован.
 				</section>
 
 				<section>
-					List в библиотеке Scala - не совсем immutable:
+					<p>List в библиотеке Scala - не совсем immutable:
 					<pre><code class="scala">
 final case class ::[B](override val head: B, 
                        private[scala] var tl: List[B]) 
 		       extends List[B]
 					</code></pre>
+
+					<p class="fragment">Однако, для пользовательского кода
+					все гарантии сохранены.
 				</section>
 
 				<section>
@@ -444,7 +528,7 @@ final case class ::[B](override val head: B,
     current = current.tail
   }
   
-  builder.toList
+  builder.toList // после список уже никогда не изменится
 } </code></pre>
 				</section>
 
@@ -455,21 +539,64 @@ final case class ::[B](override val head: B,
 list.map(x ⇒ x * x)					
 					</code></pre>
 
-					<p>TODO: пример использования map
+					<p>можно указать готовую функцию:
+					<pre><code class="scala">
+list.map(Math.sqrt) // для List[Double]
+					</code></pre>
 				</section>
 
 				<section>
-					<p>TODO: flatten
-					<p>flatMap - аналогично, но возвращает список элементов
+					<p>Повторяем каждый элемент списка два раза:
+					<pre><code class="scala">
+val list = List(1, 2, 3)
+
+list.map(x ⇒ List.fill(2)(x))
+// List[List[Int]] = List(List(1, 1), List(2, 2), List(3, 3))
+					</code></pre>
+				</section>
+
+				<section>
+					<p>flatten - превращаем список списков в плоский:
+					<pre><code class="scala">
+val list = List(1, 2, 3)
+
+list.map(x ⇒ List.fill(2)(x)).flatten
+// List(1, 1, 2, 2, 3, 3)
+					</code></pre>
+				</section>
+
+				<section>
+					<p>flatMap - комбинация map и flatten
 
 					<pre><code class="scala">
-list.flatMap(x ⇒ List.fill(x)(Random.nextInt(10)))
+list.flatMap(x ⇒ List.fill(2)(x))
 					</code></pre>
-					<p>TODO: пример с каррингом
 				</section>
 
 				<section>
-					TODO: collect - совмещаем map, filter и pattern matching
+					<p>Как превратить List[Option[Int]] в List[Int]?
+				</section>
+
+				<section>
+					<p>Плохой способ:
+					<pre><code class="scala">
+val list = List(Some(1), None, Some(3))
+
+list.filter(_.isDefined).map(_.get)
+					</code></pre>
+					<p>Option.get - источник ошибок	
+				</section>
+
+				<section>
+					<p>collect - совмещаем map, filter и pattern matching
+					<pre><code class="scala">
+val list = List(Some(1), None, Some(3))
+
+list collect {
+  // определяем только интересные паттерны
+  case Some(v) ⇒ v
+}
+					</code></pre>
 				</section>
 
 				<section>
@@ -522,7 +649,39 @@ list.foldLeft(List.empty[Int]) { (acc, v) ⇒
 				</section>
 
 				<section>
-					TODO: пример реализации count - рекурсия и с использованием foldLeft
+					<p>Пример: функция count
+
+					<pre><code class="scala">
+val list = List.fill(1000)(Random.nextInt(100))
+
+list.count(_ &gt; 50)
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Реализация через filter:
+
+					<pre><code class="scala">
+def count(list: List[Int], f: Int ⇒ Boolean): Int = 
+  list.filter(f).length
+					</code></pre>
+					<p><small>Не эффективно, создает временный список</small>
+				</section>
+
+				<section>
+					<p>Через foldLeft:
+					<pre><code class="scala">
+def count(list: List[Int], f: Int ⇒ Boolean): Int = {
+  list.foldLeft(0) { (acc, v) ⇒
+    if (f(v)) {
+      acc + 1
+    } else {
+      acc
+    }
+  }
+}
+					</code></pre>
+					<p><small>еще можно реализовать рекурсивным обходом списка</small>
 				</section>
 
 				<section>
@@ -543,7 +702,7 @@ list.foldLeft(List.empty[Int]) { (acc, v) ⇒
 				</section>
 
 				<section>
-					<p>Домашнее задание:
+					<p>Домашнее задание (1/3):
 					<p>Элементы списка произвольной длины сдигаем влево на N позиций, например:
 					<pre><code class="scala">
 val list = List('a', 'b', 'c', 'd', 'e', 'f', 
@@ -559,15 +718,231 @@ rotate(-2, list)
 				</section>
 
 				<section>
-					<p>TODO: дополнительная часть - иммутабельная очередь: устройство, производительность
+					<p>Домашнее задание (2/3):
+					<p>Реализуем две стандартные функции:
+					<pre><code class="scala">
+// проверяем существование элемента, удовлетворяющего условию
+def exists(list: List[Int], f: Int ⇒ Boolean): Boolean = ???
+
+// проверяет что все элементы удовлетворяют условию
+def forall(list: List[Int], f: Int ⇒ Boolean): Boolean = ???
+					</code></pre>
+					<p>"Short-circuit evaluation" - вычисляем пока не получен результат.
+					<p>Одну функцию реализуем хвостовой рекурсией, вторую - циклом.
 				</section>
 
 				<section>
-					<p>TODO: доп: NonEmptyList из cats/scalaz
+					<p>Домашнее задание (3/3):
+					<p>Проверка корректности решения Судоку - головоломки с числами.
 				</section>
 
 				<section>
-					<p>TODO: операции map/filter/flatMap у Option; совместное использование Option и List
+					<img src="sudoku1.svg">
+				</section>
+
+				<section>
+					<img src="sudoku2.svg">
+				</section>
+
+				<section>
+					<p>поле представлено списком списков
+					<pre><code class="scala">
+val sudoku: List[List[Int]] = List(
+  List(1, 2, 3, 4, 5, 6, 7, 8, 9),
+  List(4, 5, 6, 7, 8, 9, 1, 2, 3),
+  List(7, 8, 9, 1, 2, 3, 4, 5, 6),
+  List(2, 3, 4, 5, 6, 7, 8, 9, 1),
+  List(5, 6, 7, 8, 9, 1, 2, 3, 4),
+  List(8, 9, 1, 2, 3, 4, 5, 6, 7),
+  List(3, 4, 5, 6, 7, 8, 9, 1, 2),
+  List(6, 7, 8, 9, 1, 2, 3, 4, 5),
+  List(9, 1, 2, 3, 4, 5, 6, 7, 8)
+)
+					</code></pre>
+					<p>Можно пользоваться любыми функциями библиотеки.
+				</section>
+
+				<section>
+					<p>Не забываем про тесты!
+				</section>
+
+				<section>
+					<h2>NonEmptyList<sup>*</sup></h2>
+					<p><small>дополнительная часть, если успеем</small>
+				</section>
+
+				<section>
+					<p>Специальный тип, реализованный в библиотеках Cats, Scalaz и др.
+
+					<pre><code class="scala">
+  // код библиотеки Cats
+  final case class NonEmptyList[+A](head: A, tail: List[A]) 
+    extends Product with Serializable 
+					</code></pre>
+					<p><small>Специальная головная ячейка списка</small>
+				</section>
+
+				<section>
+					<p>Функции которые увеличивают или не меняют длину возвращают NonEmptyList
+					<p>Остальные возвращают List
+					<p class="fragment">Стандартный список мог бы быть таким же, но разработчики
+					специально упростили его тип
+				</section>
+
+				<section>
+					Пример:
+
+					<pre><code class="scala">
+import cats.data.NonEmptyList
+
+val list: NonEmptyList[Int] =  NonEmptyList.of(1, 2, 3, 4)
+
+val list2: NonEmptyList[Int] = list.map(_ * 2)
+
+val list3: List[Int] = list.tail
+					</code></pre>
+				</section>
+
+				<section>
+					<p>зачем?
+				</section>
+
+				<section>
+					<p>Например делаем обработчик данных веб-форм на сайте
+					<div class="fragment">
+					<p>Простой вариант - функция 
+					<pre><code class="scala">
+def process(request: Request): Result
+					</code></pre>
+					<p>При ошибках - бросаем исключение
+					</div>
+				</section>
+
+				<section>
+					<p>Некорректный ввод - не исключение
+					<pre><code class="scala">
+def process(request: Request): Either[ValidationError, Result]
+					</code></pre>
+					<div class="fragment">
+						<p>Много полей - много разных ошибок
+						<pre><code class="scala">
+def process(request: Request): 
+  Either[List[ValidationError], Result]
+						</code></pre>
+					</div>
+				</section>
+
+				<section>
+					<p>Что делать если обработчик вернул Left[Nil]?
+					<div class="fragment">
+						<pre><code class="scala">
+def process(request: Request): 
+  Either[NonEmptyList[ValidationError], Result]
+						</code></pre>
+						<p><small>Избегаем ошибки при помощи более точного типа</small>
+					</div>
+				</section>
+
+				<section>
+					<h3>Неизменяемая очередь: устройство и производительность<sup>*</sup></h3>
+					<p><small>дополнительная часть, если успеем</small>
+				</section>
+
+				<section>
+					<p>У очереди две стандартные операции:
+					<ul>
+						<li>Добавить элемент в конец очереди
+						<li>Извлечь первый элемент из очереди
+					</ul>
+				</section>
+
+				<section>
+					<p>Очередь не изменяемая, помещаем в неё элемент:
+					<pre><code class="scala">
+import scala.collection.immutable.Queue
+
+var queue = Queue[String]()
+
+queue = queue.enqueue("first")
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Обрабатываем элементы
+					<pre><code class="scala">
+val (next, nextQueueValue) = queue.dequeue
+// process(next) - вариант 1
+queue = nextQueueValue
+// process(next) - вариант 2					
+					</code></pre>
+					<p class="fragment">Вопрос: в чем разница?
+				</section>
+
+				<section>
+					<p>Как это работает? List не подходит
+				</section>
+
+				<section>
+					<p>Два приватных списка:
+					<ul>
+						<li>in - для добавления
+						<li>out - для извлечения
+					</ul>
+				</section>
+
+				<section>
+					<pre><code class="scala">
+// переформатированный код библиотеки Scala 2.12.4
+def dequeue: (A, Queue[A]) = out match {
+  case Nil if !in.isEmpty =&gt; 
+    val rev = in.reverse 
+    (rev.head, new Queue(Nil, rev.tail))
+  case x :: xs =&gt; 
+    (x, new Queue(in, xs))
+  case _ =&gt; 
+    throw new NoSuchElementException("dequeue on empty queue")
+}
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Проблемы immutable Queue:
+					<ul>
+						<li>Производительность ниже чем у mutable
+						<li>Иногда плохое время отклика
+					</ul>
+				</section>
+
+				<section>
+					<h3>Операции map/filter/flatMap у Option<sup>*</sup></h3>
+					<p><small>дополнительная часть, если успеем</small>
+				</section>
+
+				<section>
+					<p>Option напоминает коллекцию, которая или пустая, или содержит один элемент
+				</section>
+
+				<section>
+					<pre><code class="scala">
+val v: Option[Int] = Some(11)
+
+v.filter(_ &gt; 5) // Some(11)
+v.map(_ * 2) // Some(22)
+					</code></pre>
+				</section>
+
+				<section>
+					<pre><code class="scala">
+val users = List(1 -&gt; "Petya", 11 -&gt; "Vasya", 23 -&gt; "Ivan")
+v.flatMap(id ⇒ users.find(_._1 == id)).map(_._2)
+// Some("Vasya")
+					</code></pre>
+					<div class="fragment"><p>С следующий раз поговорим о хеш-таблицах
+					<pre><code class="scala">
+val usersMap = Map(1 -&gt; "Petya", 11 -&gt; "Vasya", 23 -&gt; "Ivan")
+v.flatMap(usersMap.get)
+					</code></pre>
+					</div>
 				</section>
 			</div>
 
