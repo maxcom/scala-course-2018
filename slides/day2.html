@@ -32,13 +32,13 @@
 				<section>
 					<h3>План</h2>
 					<ol>
-						<li>Орг. вопросы
+						<li>Орг. вопросы и результаты домашнего задания
 						<li>Обзор большого практического задания
 						<li>Функциональный подход и иммутабельность. 
 						<li>Персистентные структуры данных на примере List.
 						<li>Работа со списками: "классика" и ListBuffer.
 						<li>filter, map и fold.
-						<li>Практическая часть: пишем юнит-тесты.
+						<li>Доп.: NonEmptyList, immutable queue, операции над Option
 					</ol>
 				</section>
 
@@ -126,7 +126,7 @@ if (list.nonEmpty) {
 				<section>
 					<p>Code Style
 
-					<p>Имена переменных пишем в camelCase; имена типов и констант - MyClassName
+					<p>Имена переменных пишем в camelCase;<br> имена типов - MyClassName
 
 					<p>Подробнее: <a href="https://docs.scala-lang.org/style/" target="_blank">Scala Style Guide</a>
 				</section>
@@ -253,6 +253,8 @@ object UserRepository {
 						<li> ::(head, tail) - элемент списка, обычно называют "cons"
 						<li> Nil - пустой список
 					</ul>
+
+					<p><small>в Scheme используют просто "пару"</small>
 				</section>
 
 				<section>
@@ -337,7 +339,7 @@ def sum(list: List[Int]): Int = {
   }
 }
 					</code></pre>
-					<p>сборщик мусора собирает список прямо в процессе итерации
+					<p class="fragment">сборщик мусора собирает список прямо в процессе итерации
 					(если на него нет ссылок)
 				</section>
 
@@ -483,6 +485,13 @@ val l: List[Int] = List.fill(10)(Random.nextInt(10))
 
 l.filter(_ % 2 == 0)					
 					</code></pre>
+
+					<div class="fragment">
+					<p>эквивалентно
+					<pre><code class="scala">
+l.filter(x ⇒ x % 2 == 0)					
+					</code></pre>
+					</div>
 				</section>
 
 				<section>
@@ -824,10 +833,16 @@ val sudoku: List[List[Int]] = List(
 				</section>
 
 				<section>
+					<p>Вопрос: чем это отличается от обычного списка?
+					<pre><code class="scala">
+  final case class NonEmptyList[+A](head: A, tail: List[A]) 
+    extends Product with Serializable 
+					</code></pre>
+				</section>
+
+				<section>
 					<p>Функции которые увеличивают или не меняют длину возвращают NonEmptyList
 					<p>Остальные возвращают List
-					<p class="fragment">Стандартный список мог бы быть таким же, но разработчики
-					специально упростили его тип
 				</section>
 
 				<section>
@@ -836,7 +851,7 @@ val sudoku: List[List[Int]] = List(
 					<pre><code class="scala">
 import cats.data.NonEmptyList
 
-val list: NonEmptyList[Int] =  NonEmptyList.of(1, 2, 3, 4)
+val list: NonEmptyList[Int] = NonEmptyList.of(1, 2, 3, 4)
 
 val list2: NonEmptyList[Int] = list.map(_ * 2)
 
