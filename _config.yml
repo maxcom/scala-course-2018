@@ -16,7 +16,7 @@
 title: Scala-лазание.
 email: your-email@example.com
 description: >- # this means to ignore newlines until "baseurl:"
-  Архитектура распределенной системы (на базе Akka, Scala).
+  Архитектура распределенной системы (на базе Scala, Play Framework и Akkа).
 baseurl: "/scala-course" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 #twitter_username: jekyllrb
