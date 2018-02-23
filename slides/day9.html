@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Akka – акторы для JVM</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/moon.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1>Akka и акторы</h1>
+					<p>Часть 9. Модель акторов и её применение для построения распределенных и отказоустойчивых приложений</p>
+					<p><small>Страничка курса: <a href="https://maxcom.github.io/scala-course/">https://maxcom.github.io/scala-course/</small></a>
+				</section>
+
+				<section>
+					<h2>План</h2>
+                                        <ol>
+                                          <li>Актор — асинхронный объект.</li>
+					  <li>Диспетчеры.</li>
+					  <li>Обработка исключительных ситуаций.</li>
+					  <li>Большой рассказ о гарантиях.</li>
+					  <li>CircuitBreaker.</li>
+					  <li>Регулировка скорости обработки.</li>
+					  <li>Вопросы.</li>
+					</ol>
+				</section>
+
+				<section>
+					<h2>1. Актор — асинхронный объект.</h2>
+					<table>
+						<thead>
+							<tr>
+								<th></th><th>Объект</th> <th>Актор</th>
+							</tr>
+
+							<tr class="fragment">
+								<td>Вызов</td>
+								<td>counter.incr(n)</td>
+								<td>counter ! Incr(n)</td>
+							</tr>
+							<tr class="fragment">
+								<td>Запрос</td>
+								<td>counter.get()<br>⇒ Int</td>
+								<td>counter ? Get<br>⇒ Future[Int]</td>
+							</tr>
+							<tr class="fragment">
+								<td>Параллельность</td>
+								<td>есть</td>
+								<td>нет</td>
+							</tr>
+							<tr class="fragment">
+								<td>Изменяемые аргументы</td>
+								<td>возможны</td>
+								<td>невозможны</td>
+						</thead>
+					</table>
+				</section>
+
+				<section>
+					<pre>
+<code>
+class CounterActor extends Actor {
+  import CounterActor._
+
+  private var value: Long = 0 // state
+
+  def receive = {            // behaviour
+    case Incr(n) ⇒ value += n
+    case Get     ⇒ sender() ! value
+  }
+}
+
+object CounterActor {        // protocol
+  case class Incr(n: Long)
+  case object Get
+}
+
+						</code>
+					</pre>
+				</section>
+				<section>
+
+					<pre>
+<code>
+object Main extends App {
+  val system = ActorSystem("DemoSystem")
+  val counterActor: ActorRef = 
+    system.actorOf(Props[CounterActor], name = "counter")
+
+  counterActor ! Incr(1)
+  println(Await.result(counterActor ? Get, 1.minutes))
+}
+						</code>
+					</pre>
+				</section>
+
+				<section>
+					<p>Приватное состояние без синхронизации.
+					Сериализация
+					операций над внешним миром, например актор для:</p>
+					<ul>
+						<li>чтения из RandomAccessFile (seek/read). 
+						<li>обработки данных пользователя, хранящихся во внешнем
+						    хранилище.
+					</ul>
+				</section>
+
+				<section>
+					<p>Разделяемое изменяемое состояние + параллелизм = проблемы<p>
+					<div class="fragment">
+					<p><s>Разделяемое</s> изменяемое состояние + параллелизм = 
+					«Share nothing» архитектура</p>
+					</div>
+				</section>
+
+				<section>
+					<h3>Актор состоит из:</h3>
+					<ul>
+						<li>Состояния
+						<li>Логики обработки сообщений (behaviour)
+						<li>Очереди сообщений (mailbox)
+					</ul>
+					<p><strong>ActorRef</strong> — идентификатор актора. 
+				</section>
+
+				<section>
+					<h3>Location transparency</h3>
+					<ul>
+						<li>Классический RPC — удаленные вызовы подобны локальным
+						<li>Акторы — локальные «вызовы» подобны удаленным
+					</ul>
+					<p>На заметку: мы не используем remote actors; но принципиально
+					   это ничего не меняет</p>
+				</section>
+
+
+				<section>
+					<h2>Диспетчеры</h2>
+					<ul>
+						<li>Runtime для акторов</li>
+						<li>Работают поверх Executor'ов</li>
+						<li>Рабочие треды — разделяемый ресурс</li>
+					</ul>
+				</section>
+
+				<section>
+					<h3>Диспетчеры — проблемы</h3>
+					<ul>
+						<li>Не все акторы одинаковы</li>
+						<li>Акторы с долгими задачами могут занять все треды</li>
+						<li>Диалоги с большим количеством сообщений занимают диспетчер</li>
+					</ul>
+				</section>
+
+				<section>
+					<h3>Диспетчеры под задачи</h3>
+					<ul>
+						<li>Интерактивные задачи vs фоновая пакетная обработка.
+						<li class="fragment">Блокирующиеся вызовы (JDBC, файловый ввод-вывод, вычисления на CPU).
+						<li class="fragment">Свой «отсек» на каждую подсистему (bulkheading).
+						<li class="fragment">Своя JVM и свой сервер на каждую подсистему (Akka Remote / Cluster).
+					</ul>
+					<p class="fragment">Факт: «Титаник» утонул из-за плохого разделения на отсеки.</p>
+				</section>
+
+				<section>
+					<h2>Обработка исключительных ситуаций</h2>
+					<p>Виды ошибок в автомате с газировкой:
+					<ul>
+						<li>«Не достаточно средств», «закончилась кола» — пользователю
+						<li>NullPointerException, CocaColaJam — владельцу (супервизору)
+					</ul>
+				</section>
+
+				<section>
+					<h3>Пример: драйвер базы данных</h3>
+					<ul>
+						<li>Дублирование первичного ключа, нарушение foreign key — пользователю драйвера</li>
+						<li>«БД перезагружается», «Соединение разорвано» — супервизору</li>
+					</ul>
+					<p>Иерархия: DriverActor → ConnectionActor → TransactionActor
+				</section>
+
+				<section>
+					<h3>Стратегии супервизора</h3>
+					<ul>
+						<li><strong>Restart</strong> — незаметный перезапуск.
+						<li class="fragment"><strong>Stop</strong> — остановка.
+						<li class="fragment"><strong>Escalate</strong> — обрушивает супервизор.
+					</ul>
+				</section>
+
+				<section>
+					<p>Пример для ConnectionActor</p>
+					<pre>
+<code>
+override val supervisorStrategy =
+  OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1 minute) {
+    case _: ConnectionResetException        ⇒ Restart
+    case _: DatabaseWasDeletedException     ⇒ Stop
+    case _: SharedMemoryCorruptionException ⇒ Escalate
+  }
+						</code>
+					</pre>
+					<p>Кроме быстрого перезапуска есть еще exponential back off</p>
+				</section>
+
+				<section>
+					<h3>Death pact &amp; death watch</h3>
+					<p>Пример: один запрос – три иерархии.
+					<img src="service.svg">
+				</section>
+
+				<section>
+					<p>Ожидание остановки актора:</p>
+<pre>	<code>
+context.watch(anotherActorRef)
+	</code></pre>
+					<p>Либо ловим сообщение Terminated(actorRef), либо «death pact» — останавливаемся вместе.</p>
+				</section>
+
+				<section>
+					<h2>Отсутствие гарантий доставки</h2>
+
+					<p>Сообщение теряется при:</p>
+					<ul>
+						<li>Рестарте актора</li>
+						<li>Переполнении ограниченного mailbox</li>
+						<li>Сетевых проблемах</li>
+						<li>...</li>
+					</ul>
+					<p>Только одна попытка доставки — «at most once delivery»</p>
+				</section>
+
+				<section>
+					<h2>Сказка о транзакциях</h2>
+					<ul>
+						<li>Транзакции спасут не только данные, но и нас
+						<li>Двухфазный коммит спасёт вообще всех
+					</ul>
+				</section>
+
+				<section>
+					<p>Протокол двухфазного коммита кофемашины и СУБД</p>
+					<p class="fragment">Что значит ошибка сети или таймаут?</p>
+					<ul>
+						<li class="fragment">Транзакция не прошла
+						<li class="fragment">Транзакция прошла, но не прошло подтверждение
+						<li class="fragment">Процесс еще не окончен
+					</ul>
+				</section>
+
+				<section>
+					<p>Решение проблемы</p>
+					<ul>
+						<li>Сбои допустимы
+						<li class="fragment">Журналы у всех участников операции, процедуры сверки операций и другие
+							механизмы компенсации сбоев
+						<li class="fragment">Система не консистентна пока идут операции; каждая операция
+							консистентна только в конечном счете
+						<li class="fragment">Блокировок нет
+					</ul>
+				</section>
+
+				<section>
+					<h2>Вернемся к Akka</h2>
+					<p>Сбой нельзя детектировать.<p>
+					<p>Сбой и таймаут не отличимы.</p>
+					<p>Акторы действуют независимо, транзакций и блокировок нет</p>
+				</section>
+
+				<section>
+					<p>Не нужно решать проблему ненадежной доставки. Вместо этого
+						нужно обеспечить требуемые гарантии при сбоях.</p>
+					<p class="fragment">А еще доставка внутри JVM гарантирована.</p>
+				</section>
+
+				<section>
+					<h2>Что обычно можно гарантировать</h2>
+					<p>Положительный ответ только после записи в хранилище или выполнения действия</p>
+					<p>Откладывание выполнения с гарантиями - передача "эстафетной палочки"
+				</section>
+
+				<section>
+					<h2>Команды и события</h2>
+					<ul>
+						<li>Команда: сделай что-то. Выполняем её с гарантиями.
+						<li class="fragment">Событие: что-то произошло, реагируй на это. Можем пропустить,
+							если потом можем это компенсировать.
+					</ul>
+				</section>
+
+				<section>
+					<h3>«Happy path &amp; self heal»</h3>
+					<p>Пример в indexer-ng.</p>
+					<p class="fragment">«Happy path» — игнорируем сбои при первичной обработке события.</p>
+					<p class="fragment">«Self heal» – периодически проводим сверку и запускаем в обработку то, что
+					не смогли обработать ранее.</p>
+				</section>
+
+				<section>
+					<h2>Circuit Breaker</h2>
+					<p>«Предохранитель», которые можно вставлять между подсистемами.</p>
+					<p class="fragment">«Разрывает цепь» при частых ошибках.</p>
+					<div class="fragment">
+					<p>«Замыкает цепь» после таймаута и после успешных пробных запросов.</p>
+					<p>Можно использовать вне Akka.</p>
+					</div>
+				</section>
+
+				<section>
+					<h2>Регулировка скорости обработки</h2>
+					<p>Проблема: быстрый producer + медленный consumer = Out Of Memory</p>
+					<p class="fragment">Решение: выбрасываем то, что не успеваем обработать</p>
+					<p class="fragment">Решение: замедляем producer'а (back pressure)</p>
+				</section>
+
+				<section>
+					<h3>Back pressure</h3>
+					<p>Раньше делали сами; теперь всегда используем akka-streams.</p>
+				</section>
+
+				<section>
+					<h1>Вопросы</h1>
+				</section>
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+                                controls: true,
+                                progress: true,
+                                history: true,
+                                center: true,
+
+                                transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+
+	</body>
+</html>
