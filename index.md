@@ -8,7 +8,7 @@ layout: default
 # Слайды
 
 * [Обзор курса](slides/index.html)
-* [Часть 1. Базовые типы Scala и pattern matching](slides/day1.html); Пример [Unit теста](https://github.com/maxcom/scala-course/tree/gh-pages/code/unit-test-demo). 15 февраля
+* [Часть 1. Базовые типы Scala и pattern matching](slides/day1.html); Пример [Unit теста](https://github.com/maxcom/scala-course/tree/gh-pages/code/unit-test-demo). 15 февраля. [Видео](https://youtu.be/NkFrCUlIS6U).
 * [Часть 2. Иммутабельность и базовые структуры данных. Работа со списками.](slides/day2.html) 22 февраля.
 * [Часть 3. Персистентные структуры данных. Ленивые вычисления. Монады.](slides/day3.html) Первая часть практического задания: классификатор. 1 марта.
 * Часть 4. Implicit значения и преобразования. Тайпклассы. Сериализация JSON в play-json. 15 марта.
