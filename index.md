@@ -24,9 +24,9 @@ layout: default
 
 # Проверка домашних заданий
 
-* [Результаты проверки домашних заданий](https://docs.google.com/spreadsheets/d/1N9J-5koTlKMN2bpXkREhHM7Y1WyjD2zuoysjpxezlvM/)
+* Табличка [Результатов проверки домашних заданий и посещений](https://docs.google.com/spreadsheets/d/1N9J-5koTlKMN2bpXkREhHM7Y1WyjD2zuoysjpxezlvM/)
 
-# Материалы для большого задания
+# Материалы для большого практического задания
 
 * Денис Баженов: [Наивный байесовский классификатор](http://bazhenov.me/blog/2012/06/11/naive-bayes.html) ([сохраненная копия сайта](https://github.com/maxcom/bazhenov.github.com))
 * [Корпус коротких текстов для настройки классификатора](http://study.mokoron.com/). При использовании корпуса, просьба ссылаться на 
