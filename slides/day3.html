@@ -236,12 +236,47 @@ m.map(p ⇒ p._1.toUpperCase -&gt; p._2)
 				</section>
 
 				<section>
-					<p>Добавление и удаление - effectively constant, как у Vector
+					<p>Добавление и удаление - effectively constant,<br> как у Vector
 				</section>
 
 				<section>
-					<h3>"call by value" и "call by name"</h3>
-					<p>TODO
+					<h3>Ленивые вычисления</h3>
+				</section>
+
+				<section>
+					<p>Откладываем вычисления до момента<br> когда нужен результат
+				</section>
+
+				<section>
+					<p>Параметры функции могут:
+					<ul>
+						<li>Вычисляться до вызова функции - "call by value"
+						<li>Вычисляются внутри функции при обращении - "call by name"
+					</ul>
+				</section>
+
+				<section>
+					<p>Пример: Option.getOrElse
+					<pre><code class="scala">
+def getOrElse(opt: Option[Int], default: ⇒ Int): Int = {
+  opt match {
+    case None    ⇒ default // вычисляется прямо тут
+    case Some(v) ⇒ v  
+  }
+}
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Значение вычисляется заново каждый раз
+					<pre><code class="scala">
+// метод List[A]
+  def fill[A](n: Int)(elem: =&gt; A): List[A]
+					</code></pre>
+					<p>Создает новый список с разными элементами
+					<pre><code class="scala">
+List.fill(10)(Random.nextInt)
+					</code></pre>
 				</section>
 
 				<section>
