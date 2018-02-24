@@ -280,8 +280,43 @@ List.fill(10)(Random.nextInt)
 				</section>
 
 				<section>
-					<h3>lazy</h3>
-					<p>TODO
+					<p>такие вызовы похожи на передачу функции без аргументов
+				</section>
+
+				<section>
+					<h3>lazy val</h3>
+					<p>"Ленивые" значения - вычисляются один раз,
+					результат сохраняется (memoization)
+				</section>
+
+				<section>
+					<pre><code class="scala">
+import java.time.{Duration, Instant}
+
+lazy val lazyCurrent = Instant.now
+val current = Instant.now
+
+Thread.sleep(1000)
+
+Duration.between(lazyCurrent, current) 
+// разница больше секунды
+					</code></pre>
+					<p>В worksheet не работает - "эффект наблюдателя"
+				</section>
+
+				<section>
+					<p>lazy работает и в классах, и внутри функций
+				</section>
+
+				<section>
+					<p>Превращаем call by name в lazy:
+					<pre><code class="scala">
+def repeat(n: Int, v : ⇒ Int) {
+  lazy val cached = v // вычисляется 0 или 1 раз
+  
+  List.fill(n)(cached)
+}
+					</code></pre>
 				</section>
 
 				<section>
