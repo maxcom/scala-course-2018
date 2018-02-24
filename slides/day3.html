@@ -321,7 +321,104 @@ def repeat(n: Int, v : ⇒ Int) {
 
 				<section>
 					<h3>Stream: ленивый список</h3>
-					<p>TODO
+				</section>
+
+				<section>
+					<p>Структура похожа на List
+					<pre><code class="scala">
+val s: Stream[Int] = 3 #:: 2 #:: 1 #:: Stream.empty
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Два вида ячеек:
+					<ul>
+						<li>Stream.Cons[+A](hd: A, tl: =&gt; Stream[A])
+						<li>Stream.Empty
+					</ul>
+				</section>
+
+				<section>
+					<p>Cons ячека вычисляет "хвост" при обращении,<br>
+					и сохраняет его. Только до следующего звена.
+				</section>
+
+				<section>
+					<p>Функции тоже работают лениво, например map:
+					<pre><code class="scala">
+var n: Int = 0
+val s: Stream[Int] = Stream.fill(100000) {
+  n += 1
+  Random.nextInt
+}
+
+s.map(_ * 2).take(1).toVector
+
+println(n) // 1
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Пример реализации map:
+					<pre><code class="scala">
+def map(s: Stream[Int], f: Int ⇒ Int): Stream[Int] = {
+  if (s.isEmpty) {
+    s
+  } else {
+    f(s.head) #:: map(s.tail, f)
+  }
+}
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Функции, обходящие весь список "форсируют" его.<br>
+					Например length или fold.
+				</section>
+
+				<section>
+					<p>Stream может быть бесконечным
+				</section>
+
+				<section>
+					<p>Фибоначчи: каждое последующее число равно сумме двух предыдущих чисел
+
+					<pre><code class="scala">
+import scala.math.BigInt
+lazy val fibs: Stream[BigInt] = BigInt(0) #::
+                                BigInt(1) #::
+                                fibs.zip(fibs.tail).map { n =&gt; 
+				  n._1 + n._2 
+				}
+
+fibs.take(5).toVector
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Применение:
+					<ul>
+						<li>Числа Фибоначчи :-)
+						<li>Алгоритмы поиска "в ширину"
+						<li>наверное другие
+					</ul>
+				</section>
+
+				<section>
+					<p>Основное практическое применение:
+					<ul>
+						<li>Оптимизация серий трансформаций коллекций
+						<li>Остановка вычислений когда получен результат
+					</ul>
+				</section>
+
+				<section>
+					<p>Минусы:
+					<ul>
+						<li>Плохо сочетаются с исключениями и побочными эффектами
+						<li>Задержки - иногда тоже побочный эффект
+						<li>Бесконечные последовательности легко случайно форсировать
+					</ul>
 				</section>
 
 				<section>
