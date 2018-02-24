@@ -37,10 +37,8 @@
 						<li>Персистентные структуры: Vector и HashMap
 						<li>"call by value" и "call by name"; lazy
 						<li>Stream: ленивый список.
-						<li>Трансформации Option, Try и Either.
 						<li>монады и for.
-						<li>Последовательные вычисления в Eval из библиотеки cats.
-						<li>Дополительная часть: property based testing.
+						<li>Дополнительная часть: Eval из библиотеки cats.
 					</ol>
 				</section>
 
@@ -461,25 +459,51 @@ opt.flatMap(findUserId).flatMap(loadUserById)
 				</section>
 
 				<section>
-					<h3>Трансформации Try и Either</h3>
-					<p>TODO
+					<p>for { ... } yield { ... }</p>
+
+					<p>Комбинирует flatMap и map<br>
+					(и еще filter и collect, но сейчас это не важно)
 				</section>
 
 				<section>
-					<h3>Монады и for</h3>
-
-					<p>TODO
+					<pre><code class="scala">
+val jobTitle: Option[String] = for {
+  name &lt;- opt // первая операция определяет тип
+  id   &lt;- findUserId(name)
+  user &lt;- loadUserById(id)
+} yield {
+  user.jobTitle
+}
+					</code></pre>
+					<p><small>Посмотрите "desugar for" в IDEA</small>
 				</section>
 
 				<section>
-					<h3>Последовательные вычисления в Eval</h3>
-
-					<p>TODO
+					<p>Монада - абстракция цепочки связанных вычислений.
 				</section>
 
 				<section>
-					<h3>Property based testing (scalacheck)<sup>*</sup></h3>
+					<p>Try - тоже монада; вычисляется пока не возникнет
+					исключение
+				</section>
+
+				<section>
+					<p>Either - монада в Scala 2.12. Вычисляется правая сторона,
+					левая сторона - остановка вычисления.
+				</section>
+
+				<section>
+					<h3>Последовательные вычисления в Eval<sup>*</sup></h3>
 					<p><small>дополнительная часть, если успеем</small>
+				</section>
+
+				<section>
+					<p>Вычисления не обязательно должны происходить
+					прямо сейчас и в текущем потоке.
+					<p class="fragment">Future - монада, выполняющая
+					вычисление в другом потоке. Об этом потом.
+					<p class="fragment">Рассмотрим Eval - монаду, выполняющую
+					ленивые вычисления.
 				</section>
 
 				<section>
