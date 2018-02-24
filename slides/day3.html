@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>Персистентные структуры данных. Ленивые вычисления. for-нотация</title>
+		<title>Персистентные структуры данных. Ленивые вычисления. Монады.</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
 		<link rel="stylesheet" href="css/theme/moon.css">
@@ -25,19 +25,165 @@
 		<div class="reveal">
 			<div class="slides">
 				<section>
-					<h2>Часть 3. Персистентные структуры данных. Ленивые вычисления. for-нотация</h2>
+					<h2>Часть 3. Персистентные структуры данных. Ленивые вычисления. Монады.</h2>
 					<p><small>Страничка курса: <a href="https://maxcom.github.io/scala-course/">https://maxcom.github.io/scala-course/</small></a>
 				</section>
 
 				<section>
 					<h3>План</h2>
 					<ol>
-						<li>Персистентные структуры данных: Vector и HashMap
-						<li>Ленивые вычисления и побочные эффекты. Stream.
-						<li>Трансформации Option, Try и Either; 
-						<li>for-нотация. 
-						<li>Практическая часть: property based testing - scalacheck.
+						<li>Практическое задание: пишем классификатор
+						<li>Разбор домашних заданий
+						<li>Персистентные структуры: Vector и HashMap
+						<li>"call by value" и "call by name"; lazy
+						<li>Stream: ленивый список.
+						<li>Трансформации Option, Try и Either.
+						<li>монады и for.
+						<li>Последовательные вычисления в Eval из библиотеки cats.
+						<li>Дополительная часть: property based testing.
 					</ol>
+				</section>
+
+				<section>
+					<h3>Орг. вопросы</h3>
+					<ul>
+						<li>Выложил видео первых 2-х лекций
+						<li>Новый план занятий
+						<li>Akka - будет!
+					</ul>
+				</section>
+
+				<section>
+					<h3>Практическое задание: пишем классификатор</h3>
+				</section>
+
+				<section>
+					<p>Классификатор - алгоритм, относящий входные данные к одному
+					из предопределенных классов.
+
+					<p class="fragment">Разработаем классификатор, определяющий
+					является ли короткий текст позитивным, негативным или нейтральным.
+				</section>
+
+				<section>
+					<p>На старте программы обучим классификатор на готовых текстах с оценками.
+
+					<p class="fragment">После на основе статистики будем оценивать произвольный текст.
+				</section>
+
+				<section>
+					<p>Реализуем наивный байесовский классификатор
+
+					<ul>
+						<li>Один из наиболее часто используемых
+						<li class="fragment">Прост в реализации и отладке
+						<li class="fragment">Я нашел хорошее описание с примером на Scala
+					</ul>
+				</section>
+
+				<section>
+					<p>Денис Баженов: <a target="_blank" href="http://bazhenov.me/blog/2012/06/11/naive-bayes.html">Наивный байесовский классификатор</a>
+					<p>В статье есть:
+					<ul>
+						<li>Описание в применении к текстам
+						<li>Описание как запрограммировать
+						<li>Пример расчета - подойдет для тестов
+						<li>Пример реализации на Scala
+					</ul>
+				</section>
+
+				<section>
+					<p>Для обучения классификатора используем готовый корпус:
+
+					<p><a target="_blank" href="http://study.mokoron.com/">Корпус коротких текстов для настройки классификатора</a>
+					<p><small>При использовании корпуса, просьба ссылаться на
+  следующую работу: <a target="_blank" href="https://elibrary.ru/item.asp?id=20399632">Автоматическое построение и анализ корпуса коротких текстов (постов микроблогов) для задачи разработки и тренировки тонового классификатора</a></small>
+				</section>
+
+				<section>
+					<p>Что делаем:
+					<ul>
+						<li>Классификатор с тестами
+						<li>Разбиение текста на слова с зачисткой
+						<li>Чтение корпуса твитов из CSV
+						<li>Программу, классифицирующую введенный текст
+					</ul>
+				</section> 
+
+				<section>
+					<p>На реализацию есть две недели:<br>8-го марта занятий не будет.
+				</section>
+
+				<section>
+					<p>Работу над кодом ведем на gitlab.com!
+
+					<p><small>приватный github.com - тоже можно, у кого есть</small>
+				</section> 
+
+				<section>
+					<h3>Разбор домашних заданий</h3>
+
+					<p>TODO
+				</section>
+
+				<section>
+					<h3>Vector</h3>
+					<p>TODO
+				</section>
+
+				<section>
+					<h3>HashMap</h3>
+					<p>TODO
+				</section>
+
+				<section>
+					<h3>"call by value" и "call by name"
+					<p>TODO
+				</section>
+
+				<section>
+					<h3>lazy</h3>
+					<p>TODO
+				</section>
+
+				<section>
+					<h3>Stream: ленивый список</h3>
+					<p>TODO
+				</section>
+
+				<section>
+					<h3>Трансформации Option, Try и Either</h3>
+					<p>TODO
+				</section>
+
+				<section>
+					<h3>Монады и for</h3>
+
+					<p>TODO
+				</section>
+
+				<section>
+					<h3>Последовательные вычисления в Eval
+
+					<p>TODO
+				</section>
+
+				<section>
+					<h3>Property based testing (scalacheck)<sup>*</sup></h3>
+					<p><small>дополнительная часть, если успеем</small>
+				</section>
+
+				<section>
+					<p>TODO
+				</section>
+
+				<section>
+					<p>Напоминаю:
+					<ul>
+						<li>Страничка курса: <a href="https://maxcom.github.io/scala-course/">https://maxcom.github.io/scala-course/</a>
+						<li>Посещения - отмечаем на листочке
+						<li>Следующее занятие - 15 марта
+					</ul>
 				</section>
 			</div>
 
