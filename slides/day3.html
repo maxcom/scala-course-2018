@@ -422,7 +422,46 @@ fibs.take(5).toVector
 				</section>
 
 				<section>
-					<h3>Трансформации Option, Try и Either</h3>
+					<p>«Монада — всего лишь моноид из категории эндофункторов, что может быть проще?»
+					<p><small>(c) <a target="_blank" href="http://james-iry.blogspot.ru/2009/05/brief-incomplete-and-mostly-wrong.html">A Brief, Incomplete, and Mostly Wrong History of Programming Languages</a></small>
+				</section>
+
+				<section>
+					<p>Монада - тип данных, <br>реализующий операции:
+					<ul>
+						<li>создания
+						<li>flatMap
+					</ul>
+					<p>и выполняющий несколько законов
+				</section>
+
+				<section>
+					<p>Рассмотрим на примере Option
+					<pre><code class="scala">
+def findUserId(name: String): Option[Int] = ???
+def loadUserById(id: Int): Option[User] = ???
+
+val opt = Option("username") // создание
+
+opt.flatMap(findUserId).flatMap(loadUserById)
+					</code></pre>
+					<p>Последовательное вычисление пока не встретится None
+				</section>
+
+				<section>
+					<p>Законы:
+					<ul>
+						<li>разделение на создание и применение значимо<br>
+						unit(x).flatMap(f) == f(x)
+						<li>функция создания не меняет монаду<br>
+						m.flatMap(unit) == m
+						<li>ассоциативность<br>
+						m.flatMap(f).flatMap(g) == <br>m.flatMap(x =&gt; f(x).flatMap(g))
+					</ul>
+				</section>
+
+				<section>
+					<h3>Трансформации Try и Either</h3>
 					<p>TODO
 				</section>
 
