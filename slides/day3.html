@@ -190,7 +190,53 @@
 
 				<section>
 					<h3>HashMap</h3>
-					<p>TODO
+				</section>
+
+				<section>
+					<p>для пользователя:
+					<pre><code class="scala">
+Map("one" &gt; "first", "two" &gt; "second", "three" -&gt; "third")
+
+m.get("one") // Some("first")
+
+val m1 = m + ("five" -&gt; "fifth") // добавление
+
+val m2 = m - "one" // удаление
+					</code></pre>
+				</section>
+
+				<section>
+					<p>map/flatMap/filter/fold - аналогично<br>
+					Seq[(K,V)]
+					<pre><code class="scala">
+m.map(p ⇒ p._1.toUpperCase -&gt; p._2)
+					</code></pre>
+					<p>В Scala эти операции не меняют тип исходной коллекции
+				</section>
+
+				<section>
+					<p>Ключ - неизменяемый объект любого типа
+
+					<div class="fragment">
+					<p>Метод hashCode возвращает Int для любого объекта
+					<ul>
+						<li>У равных (equals) объектов они одинаковые
+						<li>У неравных - различные, насколько это возможно
+						<li>У case class и пар создается автоматически
+					</ul>
+					</div>
+				</section>
+
+				<section>
+					<p>Реализация - префиксное дерево с основанием 32
+				</section>
+
+				<section>
+					<p>TODO: картинка поиска в hash map
+				</section>
+
+				<section>
+					<p>Добавление и удаление - effectively constant, как у Vector
 				</section>
 
 				<section>
