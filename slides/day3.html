@@ -119,13 +119,13 @@
 				</section> 
 
 				<section>
-					<p>Зачем мы говорили о List?</p>
-				</section>
-
-				<section>
 					<h3>Разбор домашних заданий</h3>
 
 					<p>TODO
+				</section>
+
+				<section>
+					<p>Зачем мы говорили о List?</p>
 				</section>
 
 				<section>
@@ -149,16 +149,16 @@
 				</section>
 
 				<section>
-					<p>TODO: картинка структуры и добавления в конец
+					<p>TODO: Картинка получения элемента и структуры
+				</section>
+
+				<section>
+					<p>TODO: картинка добавления в конец
 				</section>
 
 				<section>
 					<p>Добавление в начало - аналогично;<br>
 					Vector хранит смещение первого элемента
-				</section>
-
-				<section>
-					<p>TODO: Картинка получения элемента
 				</section>
 
 				<section>
@@ -416,6 +416,7 @@ fibs.take(5).toVector
 						<li>Плохо сочетаются с исключениями и побочными эффектами
 						<li>Задержки - иногда тоже побочный эффект
 						<li>Бесконечные последовательности легко случайно форсировать
+						<li>Первый элемент не ленивый
 					</ul>
 				</section>
 
@@ -425,12 +426,14 @@ fibs.take(5).toVector
 				</section>
 
 				<section>
-					<p>Монада - тип данных, <br>реализующий операции:
+					<p>Монада - значение, помещенное в контекст.
+					<div class="fragment">
+					<p>Операции:
 					<ul>
-						<li>создания
-						<li>flatMap
+						<li>создания - помещает значение в контекст
+						<li>flatMap - применяет к значению функцию, возвращающую новые значение и контекст
 					</ul>
-					<p>и выполняющий несколько законов
+					</div>
 				</section>
 
 				<section>
@@ -447,7 +450,7 @@ opt.flatMap(findUserId).flatMap(loadUserById)
 				</section>
 
 				<section>
-					<p>Законы:
+					<p>Законы, которые должны выполнять монады:
 					<ul>
 						<li>разделение на создание и применение значимо<br>
 						unit(x).flatMap(f) == f(x)
@@ -493,21 +496,30 @@ val jobTitle: Option[String] = for {
 				</section>
 
 				<section>
-					<h3>Последовательные вычисления в Eval<sup>*</sup></h3>
-					<p><small>дополнительная часть, если успеем</small>
-				</section>
-
-				<section>
 					<p>Вычисления не обязательно должны происходить
 					прямо сейчас и в текущем потоке.
 					<p class="fragment">Future - монада, выполняющая
 					вычисление в другом потоке. Об этом потом.
-					<p class="fragment">Рассмотрим Eval - монаду, выполняющую
+					<p class="fragment">Рассмотрим Eval из Cats - монаду, выполняющую
 					ленивые вычисления.
 				</section>
 
 				<section>
-					<p>TODO
+					<pre><code class="scala">import cats.Eval
+
+case class User(id: Int, info: String)
+def loadUserById(id: Int): User = ???
+
+// стоит pipeline
+val result = for {
+  v &lt;- Eval.now(10)
+  user &lt;- Eval.later(loadUserById(v))
+} yield {
+  user.info
+}
+
+// вычисление происходит тут
+result.value</code></pre>
 				</section>
 
 				<section>
