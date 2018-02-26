@@ -430,7 +430,7 @@ fibs.take(5).toVector
 					<div class="fragment">
 					<p>Операции:
 					<ul>
-						<li>создания - помещает значение в контекст
+						<li>создания (pure) - помещает значение в контекст
 						<li>flatMap - применяет к значению функцию, возвращающую новые значение и контекст
 					</ul>
 					</div>
@@ -452,10 +452,10 @@ opt.flatMap(findUserId).flatMap(loadUserById)
 				<section>
 					<p>Законы, которые должны выполнять монады:
 					<ul>
-						<li>разделение на создание и применение значимо<br>
-						unit(x).flatMap(f) == f(x)
+						<li>разделение на создание и применение<br>
+						M.pure(x).flatMap(f) == f(x)
 						<li>функция создания не меняет монаду<br>
-						m.flatMap(unit) == m
+						m.flatMap(M.pure) == m
 						<li>ассоциативность<br>
 						m.flatMap(f).flatMap(g) == <br>m.flatMap(x =&gt; f(x).flatMap(g))
 					</ul>
