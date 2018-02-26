@@ -450,15 +450,32 @@ opt.flatMap(findUserId).flatMap(loadUserById)
 				</section>
 
 				<section>
-					<p>Законы, которые должны выполнять монады:
-					<ul>
-						<li>разделение на создание и применение<br>
-						M.pure(x).flatMap(f) == f(x)
-						<li>функция создания не меняет монаду<br>
-						m.flatMap(M.pure) == m
-						<li>ассоциативность<br>
-						m.flatMap(f).flatMap(g) == <br>m.flatMap(x =&gt; f(x).flatMap(g))
-					</ul>
+					<p>Законы, которые должны выполнять монады
+				</section>
+
+				<section>
+					<p>"Left Identity"
+
+					<p>pure(x).flatMap(f) == f(x)
+
+					<p>применение функции к значению в монаде
+					эквивалентно применению функции к значению
+				</section>
+
+				<section>
+					<p>"Right Identity"
+
+					<p>m.flatMap(pure) == m
+
+					<p>применение функция создания не меняет монаду
+				</section>
+
+				<section>
+					<p>ассоциативность
+
+					<p>m.flatMap(f).flatMap(g) == <br>m.flatMap(x =&gt; f(x).flatMap(g))
+
+					<p>уравнивает разные способы комбинации функций
 				</section>
 
 				<section>
