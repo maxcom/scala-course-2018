@@ -37,8 +37,8 @@
 						<li>Персистентные структуры: Vector и HashMap
 						<li>"call by value" и "call by name"; lazy
 						<li>Stream: ленивый список.
-						<li>монады и for.
-						<li>Дополнительная часть: Eval из библиотеки cats.
+						<li>Монады и for.
+						<li>Пример: Eval из библиотеки cats.
 					</ol>
 				</section>
 
@@ -426,6 +426,12 @@ fibs.take(5).toVector
 				</section>
 
 				<section>
+					<p>Для нас монада - шаблон проектирования.
+
+					<p>Много типов из разных областей являются монадами.
+				</section>
+
+				<section>
 					<p>Монада - значение, помещенное в контекст.
 					<div class="fragment">
 					<p>Операции:
@@ -499,7 +505,35 @@ val jobTitle: Option[String] = for {
 				</section>
 
 				<section>
+					<pre><code class="scala">
+opt.flatMap(name => 
+  findUserId(name).flatMap(id => 
+    loadUserById(id).map(user => 
+      user.jobTitle)))
+					</code></pre>
+				</section>
+
+				<section>
+					<pre><code class="scala">opt match {
+  case Some(name) ⇒
+    findUserId(name) match {
+      case Some(id) ⇒
+        loadUserById(id) match {
+          case Some(user) ⇒ user.jobTitle
+          case None       ⇒ None  
+        }
+      case None ⇒
+        None
+    }
+  case None ⇒
+    None
+}</code></pre>
+				</section>
+
+				<section>
 					<p>Монада - абстракция цепочки связанных вычислений.
+
+					<p class="fragment">Монада контролирует выполнение этой цепочки.
 				</section>
 
 				<section>
@@ -515,9 +549,25 @@ val jobTitle: Option[String] = for {
 				<section>
 					<p>Вычисления не обязательно должны происходить
 					прямо сейчас и в текущем потоке.
-					<p class="fragment">Future - монада, выполняющая
-					вычисление в другом потоке. Об этом потом.
-					<p class="fragment">Рассмотрим Eval из Cats - монаду, выполняющую
+				</section>
+
+				<section>
+					<p>Future - монада, выполняющая
+					вычисление в другом потоке.
+					<p class="fragment">Операция flatMap позволяет избежать
+					цепочек callback'ов.
+					<p class="fragment">Рассмотрим её устройство на 5-й встрече.
+				</section>
+
+				<section>
+					<p>Free - монада, свободная о какой-то реализации логики.
+
+					<p class="fragment">Собирает pipeline в структуру, которую
+					потом можно передать в интерпретатор.
+				</section>
+
+				<section>
+					<p>Рассмотрим Eval из Cats - монаду, выполняющую
 					ленивые вычисления.
 				</section>
 
