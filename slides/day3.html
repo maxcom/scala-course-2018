@@ -510,7 +510,7 @@ val jobTitle: Option[String] = for {
 case class User(id: Int, info: String)
 def loadUserById(id: Int): User = ???
 
-// стоит pipeline
+// строим pipeline
 val result = for {
   v &lt;- Eval.now(10)
   user &lt;- Eval.later(loadUserById(v))
