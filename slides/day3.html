@@ -436,8 +436,9 @@ fibs.take(5).toVector
 					<div class="fragment">
 					<p>Операции:
 					<ul>
-						<li>создания (pure) - помещает значение в контекст
-						<li>flatMap - применяет к значению функцию, возвращающую новые значение и контекст
+						<li>создания (pure; unit; return) - помещает значение в контекст
+						<li>map - применяет к значению функцию, возвращающую новое значение
+						<li>flatMap (bind) - применяет к значению функцию, возвращающую новые значение и контекст
 					</ul>
 					</div>
 				</section>
@@ -485,6 +486,10 @@ opt.flatMap(findUserId).flatMap(loadUserById)
 				</section>
 
 				<section>
+					<p>for в Scala – не цикл
+				</section>
+
+				<section>
 					<p>for { ... } yield { ... }</p>
 
 					<p>Комбинирует flatMap и map<br>
@@ -506,9 +511,9 @@ val jobTitle: Option[String] = for {
 
 				<section>
 					<pre><code class="scala">
-opt.flatMap(name => 
-  findUserId(name).flatMap(id => 
-    loadUserById(id).map(user => 
+opt.flatMap(name =&gt; 
+  findUserId(name).flatMap(id =&gt; 
+    loadUserById(id).map(user =&gt; 
       user.jobTitle)))
 					</code></pre>
 				</section>
