@@ -457,35 +457,6 @@ opt.flatMap(findUserId).flatMap(loadUserById)
 				</section>
 
 				<section>
-					<p>Законы, которые должны выполнять монады
-				</section>
-
-				<section>
-					<p>"Left Identity"
-
-					<p>pure(x).flatMap(f) == f(x)
-
-					<p>применение функции к значению в монаде
-					эквивалентно применению функции к значению
-				</section>
-
-				<section>
-					<p>"Right Identity"
-
-					<p>m.flatMap(pure) == m
-
-					<p>применение функция создания не меняет монаду
-				</section>
-
-				<section>
-					<p>ассоциативность
-
-					<p>m.flatMap(f).flatMap(g) == <br>m.flatMap(x =&gt; f(x).flatMap(g))
-
-					<p>уравнивает разные способы комбинации функций
-				</section>
-
-				<section>
 					<p>for в Scala – не цикл
 				</section>
 
@@ -540,6 +511,36 @@ opt.flatMap(name =&gt;
 
 					<p class="fragment">Монада контролирует выполнение этой цепочки.
 				</section>
+
+				<section>
+					<p>Законы, которые должны выполнять монады
+				</section>
+
+				<section>
+					<p>"Left Identity"
+
+					<p>pure(x).flatMap(f) == f(x)
+
+					<p>применение функции к значению в монаде
+					эквивалентно применению функции к значению
+				</section>
+
+				<section>
+					<p>"Right Identity"
+
+					<p>m.flatMap(pure) == m
+
+					<p>применение функция создания не меняет монаду
+				</section>
+
+				<section>
+					<p>ассоциативность
+
+					<p>m.flatMap(f).flatMap(g) == <br>m.flatMap(x =&gt; f(x).flatMap(g))
+
+					<p>уравнивает разные способы комбинации функций
+				</section>
+
 
 				<section>
 					<p>Try - тоже монада; вычисляется пока не возникнет
