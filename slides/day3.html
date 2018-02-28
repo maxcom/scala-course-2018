@@ -149,11 +149,28 @@
 				</section>
 
 				<section>
-					<p>TODO: Картинка получения элемента и структуры
+					<p>До 32 элементов
+					<img src="Paper.Scala.1.png">
 				</section>
 
 				<section>
-					<p>TODO: картинка добавления в конец
+					<p>До 1024 элементов (32*32)
+					<img src="Paper.Scala.2.png">
+				</section>
+
+				<section>
+					<p>Очередной уровень
+					<img src="Paper.Scala.3.png">
+				</section>
+
+				<section>
+					<p>Добавление элемента - два уровня
+					<img src="Paper.Scala.4.png">
+				</section>
+
+				<section>
+					<p>Добавление элемента - три уровня
+					<img src="Paper.Scala.6.png">
 				</section>
 
 				<section>
@@ -227,14 +244,20 @@ m.map(p ⇒ p._1.toUpperCase -&gt; p._2)
 
 				<section>
 					<p>Реализация - префиксное дерево с основанием 32
+
+					<p class="fragment">Похоже на вектор, только индексом выступает hashCode
+
+					<p class="fragment">Структура "разряженная", на каждом уровне могут быть
+					и данные, и ссылки на подуровни.
 				</section>
 
 				<section>
-					<p>TODO: картинка поиска в hash map
+					<p><small>(картинка с слайда про Vector)</small>
+					<img src="Paper.Scala.3.png">
 				</section>
 
 				<section>
-					<p>Добавление и удаление - effectively constant,<br> как у Vector
+					<p>Добавление, удаление и поиск - effectively constant,<br> как у Vector
 				</section>
 
 				<section>
