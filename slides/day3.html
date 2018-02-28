@@ -257,7 +257,10 @@ m.map(p ⇒ p._1.toUpperCase -&gt; p._2)
 				</section>
 
 				<section>
-					<p>Добавление, удаление и поиск - effectively constant,<br> как у Vector
+					<p>Добавление и удаление - effectively constant,<br> как у Vector.
+
+					<p class="fragment">Поиск - effectively constant, если хеш-функция хорошая.<br>
+					Значения с одинаковым хеш-кодом хранятся в списке.
 				</section>
 
 				<section>
