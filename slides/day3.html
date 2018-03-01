@@ -192,6 +192,7 @@ for (i &lt;- list.indices) {
 						<li>Нельзя переиспользовать
 						<li>Легко вырастить в "макаронного монстра"
 					</ul>
+					<p class="fragment">Заводим функции, в Scala их можно создавать в любом блоке
 				</section>
 
 				<section>
@@ -459,6 +460,25 @@ def repeat(n: Int, v : ⇒ Int) {
   List.fill(n)(cached)
 }
 					</code></pre>
+				</section>
+
+				<section>
+					<p>Еще пример - регистронезависимый id
+					<pre><code class="scala">final case class UserId(id: String) {
+  private lazy val loId: String = id.toLowerCase()
+
+  override def equals(obj: Any) = {
+    obj match {
+      case other: UserId ⇒
+        other.loId == loId
+      case _ ⇒
+        false
+    }
+  }
+
+  override def hashCode() = loId.hashCode
+}</code></pre>
+					<p><small>демо-код, с некоторыми языками будут проблемы</small>
 				</section>
 
 				<section>
