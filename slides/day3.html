@@ -120,12 +120,130 @@
 
 				<section>
 					<h3>Разбор домашних заданий</h3>
+				</section>
 
-					<p>TODO
+				<section>
+					<p>1. Судоку - много кода.
+
+					<div class="fragment">
+					<p>Нужно было поискать короткое красивое решение.
+					<p>Вместо этого - много решений методом "грубой силы".
+				</section>
+
+				<section>
+					<img src="let_me_google_that.png">
+				</section>
+
+				<section>
+					<p>Старайтесь писать простой код - его проще отлаживать,
+					поддерживать и развивать.
+				</section>
+
+				<section>
+					<p>2. Использование return
+
+					<ul>
+						<li>Императивный стиль
+						<li>Плохо совместим с ленивыми и асинхронными вычислениями
+					</ul>
+
+					<p class="fragment">В Scala почти всё является выражением,<br> return не нужен.
+				</section>
+
+				<section>
+					<p>3. Доступ к спискам по индексу без необходимости
+
+					<pre><code class="scala">
+var set: Set[Int] = Set()
+for (i &lt;- list.indices) {
+  set += list(i)
+}
+					</code></pre>
+				</section>
+
+				<section>
+					<p>4. Комментарии вместо объявления функций
+
+					<p>Задача программиста - разбить сложную задачу
+					на набор простых.
+				</section>
+
+				<section>
+					<p>Коментарий - не средство декомпозиции
+					<pre><code class="scala">def checkSudoku(game: List[List[Int]]): Boolean = {
+  // rows
+  ...
+  много кода с объявлениями переменных
+  ...
+  //column
+  ...
+  много кода с объявлениями переменных
+  ...
+  // 3x3
+  ...
+  много кода с объявлениями переменных
+  ...
+} </code></pre>
+				</section>
+
+				<section>
+					<p>Такой код
+					<ul>
+						<li>Нельзя переиспользовать
+						<li>Легко вырастить в "макаронного монстра"
+					</ul>
+				</section>
+
+				<section>
+					<p>5. Использование == в тестах
+					<pre><code class="scala">
+  "rotate function" should {
+    "rotates left" in {
+      val l = List('a', 'b', 'c', 'd', 'e')
+      Rotator.rotate(2, l) == List('c', 'd', 'e', 'a', 'b')
+    }
+  }
+					</code></pre>
+				</section>
+
+				<section>
+					<p>== оператор сравнения языка Scala, его нельзя переопределить
+
+					<p>=== оператор из тестовой библиотеки
+				</section>
+
+				<section>
+					<p>=== лучше, он:
+					<ul>
+						<li>дает читаемые сообщения об ошибках
+						<li>работает в любом месте теста, не только в конце
+					</ul>
+				</section>
+
+				<section>
+					<p>6. Опасное использование "for"
+
+					<p>раскажу позже сегодня
 				</section>
 
 				<section>
 					<p>Зачем мы говорили о List?</p>
+
+					<ul>
+						<li class="fragment">Классика ф. п. - его идеи используются в многих других стуктурах
+						<li class="fragment">Часто спрашивают на собеседованиях
+					</ul>
+				</section>
+
+				<section>
+					<p><small>"Я видел такое, во что вы, люди, просто не поверите. 
+						Штурмовые корабли в огне на подступах к Ориону. Я смотрел, как Си-лучи мерцают 
+						во тьме близ врат Тангейзера.</small>
+					<img src="Рой Батти.jpg">
+				</section>
+
+				<section>
+					<p>Рой Батти не умеет работать с List :-(
 				</section>
 
 				<section>
@@ -532,6 +650,37 @@ opt.flatMap(name =&gt;
   case None ⇒
     None
 }</code></pre>
+				</section>
+
+				<section>
+					<p>Еще про for - пример из домашнего задания
+
+					<pre><code class="scala">
+def forall(list: List[Int], f: Int ⇒ Boolean): Boolean = {
+  var result = true
+  for (elem &lt;- list if result)
+    result = f(elem)
+  result
+}					
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Компилятор это преобразует в
+					<pre><code class="scala">
+def forall(list: List[Int], f: Int ⇒ Boolean): Boolean = {
+  var result = true
+  list.withFilter(_ =&gt; result).foreach(elem =&gt; result = f(elem))
+  result
+}
+					</code></pre>
+					<p>withFilter - это тот же фильтр,<br>только оптимизированный для for
+				</section>
+
+				<section>
+					<p>Данный код работает только потому,<br> что withFilter - ленивый.
+
+					<p class="fragment">Причем ленивый именно так, как хотел автор кода.
 				</section>
 
 				<section>
