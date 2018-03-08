@@ -201,12 +201,51 @@ implicit def str2rich(str: String): RichString =
 				</section>
 
 				<section>
-					<p>TODO
+					<p>Type class - шаблон проектирования, построенный на
+					использовании implicit преобразований.
+
+					<p class="fragment">Рассмотрим его на примере работы с JSON
 				</section>
 
 				<section>
-					<h4>JSON - история
-					<p>TODO
+					<h4>JSON</h4>
+					<p>Текстовый формат обмена данными.
+					<p class="fragment">Пришел на замену XML, который оказался
+					слишком сложным и слишком медленным.
+				</section>
+
+				<section>
+					<p>Использует синтаксис объявления данных JavaScript
+					<pre><code class="json">
+{
+   "firstName": "Иван",
+   "lastName": "Иванов",
+   "address": {
+       "streetAddress": "Московское ш., 101, кв.101",
+       "city": "Ленинград",
+       "postalCode": 101101
+   },
+   "phoneNumbers": [
+       "812 123-1234",
+       "916 123-4567"
+   ]
+}					
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Формально описан в <a target="_blank" href="https://trac.tools.ietf.org/html/rfc8259">rfc8259</a>
+
+					<p>Весь стандарт - 16 страниц текста, включая оглавления, ссылки и т.п.
+				</section>
+
+				<section>
+					<p>Json легко читается (если отформатировать); библиотеки для работы с ним есть
+					для большинства языков программирования.
+				</section>
+
+				<section>
+					<p>TODO: еще история
 				</section>
 
 				<section>
