@@ -25,12 +25,12 @@
 		<div class="reveal">
 			<div class="slides">
 				<section>
-					<h2>Часть 4. Implicit значения и преобразования. Тайпклассы. Чтение и запись JSON в play-json.</h2>
+					<h3>Часть 4. Implicit значения и преобразования. Тайпклассы. Чтение и запись JSON в play-json.</h3>
 					<p><small>Страничка курса: <a href="https://maxcom.github.io/scala-course/">https://maxcom.github.io/scala-course/</small></a>
 				</section>
 
 				<section>
-					<h3>План</h2>
+					<h3>План</h3>
 					<ol>
 						<li>Imlicit значения
 						<li>Передача контекста и конфигурации; 
@@ -43,6 +43,189 @@
 				</section>
 
 				<section>
+					<p>"Неявные" значения и преобразования - последная
+					конструкция Scala, которую мы рассмотрим на этом курсе.
+				</section>
+
+				<section>
+					<p>Implicit'ы имеют огромное количество способов
+					испрльзования, рассмотрим несколько популярных
+				</section>
+
+				<section>
+					<p>Дополнительный блок параметров функции
+					<pre><code class="scala">
+def getUser(id: Int)(implicit session: DatabaseSession): User
+					</code></pre>
+					<p>значения которого можно явно не задавать
+				</section>
+
+				<section>
+					<p>Значение должно существовать в области видимости
+					<pre><code class="scala">
+localTx { implicit session ⇒ 
+  getUser(10)
+}					
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Где это применяется? Для передачи контекста
+					<ul>
+						<li>Сессия/транзакция БД
+						<li>Конфигурация
+						<li>Свойства пользователя (права, язык, таймзона и т.п.)
+						<li>...
+					</ul>
+				</section>
+
+				<section>
+					<p>Без implicit значения пришлось бы
+					<ul>
+						<li>Явно передавать значения
+						<li>Передавать неявно через thread local и "магию" фреймворков
+					</ul>
+				</section>
+
+				<section>
+					<p>implicit значения ищутся в
+					<ul>
+						<li>Объявлениях в текущем контексте
+						<li>В import'ах - значала в точных, потом в wildcard
+						<li>В companion object связанных типов
+					</ul>
+				</section>
+
+				<section>
+					<p>Неоднозначности в поиске - ошибка компиляции
+				</section>
+
+				<section>
+					<h4>Неявные классы</h4>
+				</section>
+
+				<section>
+					<p>Преобразование одного класса в другой
+					<pre><code class="scala">
+implicit class RichString(str: String)
+					</code></pre>
+					<p>автоматическое преобразование там где необходимо
+				</section>
+
+				<section>
+					<p>"Pimp my library" - прием из динамических языков, например Ruby
+				</section>
+
+				<section>
+					<p>В Ruby код может "улучшить" любой класс, даже стандартную библиотеку
+					
+					<p class="fragment">Это называется "Monkey patch", и является опасной техникой
+				</section>
+
+				<section>
+					<p>Опасности:
+					<ul>
+						<li>Нарушение инкапсуляции
+						<li class="fragment">Проблемы при обновлении - неявные зависимости на реализацию
+						<li class="fragment">Конфликты разных "улучшателей"
+						<li class="fragment">Сложности отладки
+					</ul>
+				</section>
+
+				<section>
+					<p>Implicit class - безопасная замена этой техники
+				</section>
+
+				<section>
+					<p>Пример - добавляем метод в String
+					<pre><code class="scala">
+implicit class RichString(str: String) {
+  def letters = str.count(_.isLetter)
+}
+
+"scala 2.12".letters // = 5
+					</code></pre>
+				</section>
+
+				<section>
+					<p>В отличие от monkey patching
+					<ul>
+						<li>Разрешается в процессе компиляции
+						<li>Не влияет на существующий код
+					</ul>
+				</section>
+
+				<section>
+					<p>Более правильная версия примера:
+					<pre><code class="scala">
+implicit class RichString(val str: String) extends AnyVal {
+  def letters = str.count(_.isLetter)
+}
+					</code></pre>
+					<p><small>класс существует только в compile time</small>
+				</section>
+
+				<section>
+					<p>Технику применяют для "красоты", например:
+					<pre><code class="scala">
+import scala.concurrent.duration._
+
+val timeout: Duration = 5 minutes
+// замена Duration(5, TimeUnit.MINUTES)
+					</code></pre>
+					<p><small>еще пример - specs2</small>
+				</section>
+
+				<section>
+					<h4>Неявные преобразования</h4>
+				</section>
+
+				<section>
+					<p>Неявная функция преобразования
+
+					<pre><code class="scala">
+class RichString(val str: String) extends AnyVal {
+  def letters = str.count(_.isLetter)
+}
+
+implicit def str2rich(str: String): RichString = 
+  new RichString(str)
+
+"scala 2.12".letters
+					</code></pre>
+					<p><small>implicit функции могут иметь implicit параметры</small>
+				</section>
+
+				<section>
+					<h4>Тайпклассы</h4>
+				</section>
+
+				<section>
+					<p>TODO
+				</section>
+
+				<section>
+					<h4>JSON - история
+					<p>TODO
+				</section>
+
+				<section>
+					<h4>Запись JSON
+					<p>TODO
+				</section>
+
+				<section>
+					<h4>Чтение JSON и валидация
+					<p>TODO
+				</section>
+
+				<section>
+					<h4>Домашнее задание
+					<p>TODO
+				</section>
+
+				<section>
+					<h4>Доп: property based testing
 					<p>TODO
 				</section>
 
