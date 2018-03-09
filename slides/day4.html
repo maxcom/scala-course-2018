@@ -240,12 +240,68 @@ implicit def str2rich(str: String): RichString =
 				</section>
 
 				<section>
-					<p>Json легко читается (если отформатировать); библиотеки для работы с ним есть
+					<p>Json легко читается (если отформатировать)
+
+					<p class="fragment">Библиотеки для работы с ним есть
 					для большинства языков программирования.
 				</section>
 
 				<section>
-					<p>TODO: еще история
+					<p>Формат JSON был разработан<br>Дугласом Крокфордом.
+					<p>Видео: <a target="_blank" href="https://www.youtube.com/watch?v=-C-JoyNuQJs">The JSON Saga</a>
+				</section>
+
+				<section>
+					<p>Используем библиотеку Play JSON.
+
+					<p>Часть play-framework; можно использовать отдельно.
+				</section>
+
+				<section>
+					<p>Документация:
+					<ul>
+						<li><a target="_blank" href="https://www.playframework.com/documentation/2.6.x/ScalaJson">JSON Basics</a>
+						<li><a target="_blank" href="https://www.playframework.com/documentation/2.6.x/ScalaJsonCombinators">JSON Reads/Writes/Format Combinators</a>
+						<li><a target="_blank" href="https://www.playframework.com/documentation/2.6.x/ScalaJsonAutomated">JSON automated mapping</a>
+					</ul>
+				</section>
+
+				<section>
+					<p>Подключаем библиотеку в проект
+
+					<pre><code class="scala">
+libraryDependencies += 
+  "com.typesafe.play" %% "play-json" % "2.6.9"
+					</code></pre>
+				</section>
+
+				<section>
+					<p>JsValue - алгебраический тип
+
+					<ul>
+						<li>JsArray
+						<li>JsBoolean (JsTrue/JsFalse)
+						<li>JsNumber
+						<li>JsObject
+						<li>JsString
+						<li>JsNull
+					</ul>
+				</section>
+
+				<section>
+					<p>Запись JSON
+					<pre><code class="scala">
+import play.api.libs.json._
+
+val v: JsValue = JsObject(Seq(
+  "id" -> JsNumber(1),
+  "name" -> JsString("Vasya"),
+  "marks" -> JsArray(Seq(JsNumber(2), JsNumber(3)))
+))
+
+Json.stringify(v) // компактный формат
+Json.prettyPrint(v) // с форматированием			
+					</code></pre>
 				</section>
 
 				<section>
