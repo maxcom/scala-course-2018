@@ -495,8 +495,250 @@ object Expr {
 				</section>
 
 				<section>
-					<h4>Чтение JSON и валидация
-					<p>TODO
+					<h4>Чтение JSON и валидация</h4>
+					<p>Тайпкласс Reads для чтения
+					<pre><code class="scala">
+trait Reads[A] {
+  def reads(json: JsValue): JsResult[A]
+}
+					</code></pre>
+				</section>
+
+				<section>
+					<p>JsResult - алгебраический тип
+					<ul>
+						<li>JsSuccess - успех
+						<li>JsError - ошибка; внутри список ошибок с путями
+					</ul>
+				</section>
+
+				<section>
+					<pre><code class="scala">
+val v: JsValue = Json.arr("str1", "str2")
+
+v.validate[Seq[String]] 
+// JsSuccess(List("str1", "str2"))
+
+v.as[Seq[String]] // значение или Exception
+// List("str1", "str2")
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Case class: плохой вариант
+					<pre><code class="scala">
+case class User(id: UUID, name: String, title: Option[String])
+
+object User {
+  implicit val reads: Reads[User] = Reads[User] { json ⇒
+    JsSuccess(User(
+      id = (json \ "id").as[UUID],
+      name = (json \ "name").as[String],
+      title = (json \ "title").asOpt[String]
+    ))
+  }
+}
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Почему плохой?
+
+					<ul>
+						<li>Exception вместо JsError
+						<li>Диагностика только по<br> номерам строк из Exception
+					</ul>
+				</section>
+
+				<section>
+					<p>JsResult - монада
+					
+					<pre><code class="scala">
+implicit val reads: Reads[User] = Reads[User] { json ⇒
+  for {
+    id &lt;- (json \ "id").validate[UUID]
+    name &lt;- (json \ "name").validate[String]
+    title &lt;- (json \ "title").validateOpt[String]
+  } yield {
+    User(id, name, title)
+  }
+}
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Исключений больше нет,<br> но диагностика еще хуже
+				</section>
+
+				<section>
+					<p>Проблема: при операции поиска теряется путь
+				</section>
+
+				<section>
+					<p>Вместо работы над значениями будем конструировать функцию
+				</section>
+
+				<section>
+					<pre><code class="scala">
+val v: JsValue = ???
+val r: JsLookupResult = v \ "id" 
+// результат поиска
+
+val path: JsPath = __ \ "id"
+// путь, не привязанный к значению
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Строим Reads
+					<pre><code class="scala">
+// метод JsPath
+def read[T](implicit r: Reads[T]): Reads[T]
+					</code></pre>
+					<p>Использование
+					<pre><code class="scala">
+val idReads: Reads[UUID] = (__ \ "id").read[UUID]
+					</code></pre>
+					<p>при ошибке путь будет добавлен в JsError
+				</section>
+
+				<section>
+					<p>Reads - тоже монада
+					<pre><code class="scala">
+implicit val reads: Reads[User] = 
+  for {
+    id &lt;- (__ \ "id").read[UUID]
+    name &lt;- (__ \ "name").read[String]
+    title &lt;- (__ \ "title").readNullable[String]
+  } yield {
+    User(id, name, title)
+  }
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Чего мы получили:
+
+					<ul>
+						<li>JsError, никаких исключений
+						<li>В ошибке закодирован путь
+					</ul>
+				</section>
+
+				<section>
+					<p>Что не так?
+
+					<p class="fragment">Монада - абстракция цепочки вычислений.
+
+					<p class="fragment">У нас же все вычисления независимые, кроме шага сборки.
+				</section>
+
+				<section>
+					<p>Еще плохо - ошибка только первая;<br> надо выдать все ошибки
+
+					<p class="fragment">Монада тут - плохая абстракция.
+				</section>
+
+				<section>
+					<p>На помощь приходит<br>аппликативный функтор
+				</section>
+
+				<section>
+					<p>Это тип с операциями
+					<ul>
+						<li>pure (identity; unit; return) - создание функтора
+						<li>map - применение функции к значению; функция возвращает новое значение
+						<li>product (compose) - комбинирует два функтора в функтор от пары<br>
+					<pre><code class="scala">
+def product[A, B](fa: F[A], fb: F[B]): F[(A, B)]
+					</code></pre>
+					</ul>
+				</section>
+
+				<section>
+					<p>Замечание: есть несколько других эквивалентных отпределений "аппликатива".
+
+					<p class="fragment">Реализации функторов должны следовать нескольким законам.
+				</section>
+
+				<section>
+					<p>Reads - не только монада, но и аппликатив.
+
+					<p class="fragment">При сборке ошибки "складываются".
+				</section>
+
+				<section>
+					<p>Синтаксис:
+					<pre><code class="scala">
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
+					
+val combined: Reads[(UUID, String, Option[String])] = (
+  (__ \ "id").read[UUID] and
+  (__ \ "name").read[String] and
+  (__ \ "title").readNullable[String]).tupled
+
+val userReads: Reads[User] = 
+  combined.map((User.apply _).tupled)  
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Более удобный синтаксис:
+					<pre><code class="scala">
+val userReads: Reads[User] = (
+  (__ \ "id").read[UUID] and
+  (__ \ "name").read[String] and
+  (__ \ "title").readNullable[String])(User.apply _)
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Итого что мы получили:
+					<ul>
+						<li>Удобный язык описания парсинга
+						<li>JsError для ошибок, никаких исключений
+						<li>Все ошибки с путями
+						<li>Всё множество ошибок, а не только первая
+					</ul>
+				</section>
+
+				<section>
+					<p>Полезные инструменты:
+
+					<p>Используем готовые Reads
+
+					<pre><code class="scala">
+Reads.of[Int].map(Number.apply)
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Валидация значений:
+					<pre><code class="scala">
+import play.api.libs.json.{JsonValidationError ⇒ JsErr}
+
+Reads.of[Int].filter(JsErr("must be positive"))(_ &gt; 0)
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Разбор алгебраического типа
+					<pre><code class="scala">
+import play.api.libs.json.{JsonValidationError ⇒ JsErr}
+
+sealed trait Numbers
+object One extends Numbers
+object Two extends Numbers
+object Three extends Numbers
+
+val reads: Reads[Numbers] = 
+  Reads.of[String].collect(JsErr("bad number")) {
+    case "one"   ⇒ One
+    case "two"   ⇒ Two
+    case "three" ⇒ Three  
+}
+					</code></pre>
 				</section>
 
 				<section>
