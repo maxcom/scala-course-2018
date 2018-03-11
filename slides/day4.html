@@ -38,7 +38,6 @@
 						<li>Тайпклассы
 						<li>Сериализация и type classes на примере Play-JSON
 						<li>Практическая часть: разбор JSON из API vk.com.
-						<li>Дополнительная часть: property based testing.
 					</ol>
 				</section>
 
@@ -742,13 +741,40 @@ val reads: Reads[Numbers] =
 				</section>
 
 				<section>
-					<h4>Домашнее задание
-					<p>TODO
+					<h4>Домашнее задание</h4>
+					<p>Создаем Reads для vk.com API
+					<ul>
+						<li>newsfeed.get - получение списка новостей
+						<li>users.get - получение данных пользователя
+					</ul>
 				</section>
 
 				<section>
-					<h4>Доп: property based testing
-					<p>TODO
+					<p>newsfeed.get
+
+					<ul>
+						<li>post_id - идентификатор записи
+						<li>source_id - автор (&gt;0 пользователь, &lt;0 - группа)
+						<li>text - текст
+						<li>likes / count - число лайков
+					</ul>
+					<p>документация на <a target="_blank" href="https://vk.com/dev/newsfeed.get">newsfeed.get</a>
+				</section>
+
+				<section>
+					<p>users.get
+					<ul>
+						<li>id - идентификатор пользователя
+						<li>first_name - имя
+						<li>last_name - фамилия
+						<li>photo_100 - ссылка на фото пользователя
+					</ul>
+
+					<p>документация на <a target="_blank" href="https://vk.com/dev/users.get">users.get</a>
+				</section>
+
+				<section>
+					<p>Код добавляем в наш большой проект.
 				</section>
 
 				<section>
