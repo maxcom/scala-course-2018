@@ -8,15 +8,18 @@ layout: default
 # Слайды
 
 * [Обзор курса](slides/index.html)
-* [Часть 1. Базовые типы Scala и pattern matching](slides/day1.html); Пример [Unit теста](https://github.com/maxcom/scala-course/tree/gh-pages/code/unit-test-demo). 15 февраля. [Видео](https://youtu.be/NkFrCUlIS6U).
-* [Часть 2. Иммутабельность и базовые структуры данных. Работа со списками.](slides/day2.html) 22 февраля. [Видео](https://youtu.be/ovquUitt-co).
-* [Часть 3. Персистентные структуры данных. Ленивые вычисления. Монады.](slides/day3.html) Первая часть практического задания: классификатор. 1 марта.
-* [Часть 4. Implicit значения и преобразования. Тайпклассы. Чтение и запись JSON в play-json.](slides/day4.html) 15 марта.
-* [Часть 5. Базовые примитивы многопоточности](slides/day5.html). 22 марта.
+* [Часть 1. Базовые типы Scala и pattern matching](slides/day1.html); Пример [Unit теста](https://github.com/maxcom/scala-course/tree/gh-pages/code/unit-test-demo). 15 февраля. [Видео](https://youtu.be/NkFrCUlIS6U). [Версия для печати](slides/day1.html?print-pdf).
+* [Часть 2. Иммутабельность и базовые структуры данных. Работа со списками.](slides/day2.html) 22 февраля. [Видео](https://youtu.be/ovquUitt-co). [Версия для печати](slides/day2.html?print-pdf).
+* [Часть 3. Персистентные структуры данных. Ленивые вычисления. Монады.](slides/day3.html) Первая часть практического задания: классификатор. 1 марта. [Версия для печати](slides/day3.html?print-pdf).
+* [Часть 4. Implicit значения и преобразования. Тайпклассы. Чтение и запись JSON в play-json.](slides/day4.html) 15 марта. [Версия для печати](slides/day4.html?print-pdf).
+* [Часть 5. Базовые примитивы многопоточности](slides/day5.html). 22 марта. [Версия для печати](slides/day5.html?print-pdf).
+
 * Часть 6. HTTP протокол и Play Framework. Архитектура высоконагруженных приложений. Практическое задание: пишем сервис. 29 марта.
-* [Часть 7. Акторы Akka.](slides/day9.html) Практическое задание: REST-клиент и отслеживание новых записей. 5 апреля.
+* [Часть 7. Акторы Akka.](slides/day9.html) Практическое задание: REST-клиент и отслеживание новых записей. 5 апреля. [Версия для печати](slides/day9.html?print-pdf).
 * Часть 8. Akka Persistence и Akka Streams. Практическое задание: сохранение состояния и realtime обновление. 12 апреля.
 * Часть 9. Подводим итоги и разбор кода практического задания. 19 апреля.
+
+Внимание! Для распечатки слайдов или сохранения в PDF используейте ссылки "версии для печати" и браузер Chrome/Chromium.
 
 Дополнительные материалы
 
