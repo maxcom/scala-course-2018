@@ -30,8 +30,10 @@
 				</section>
 
 				<section>
-					<h3>План</h2>
+					<h3>План</h3>
 					<ol>
+						<li>Зачем мы говорили о play-json?
+						<li>Советы по написанию классификатора
 						<li>Поток, пулы потоков. 
 						<li>Синхронизация, блокировки и атомики. 
 						<li>Future и Promise. 
@@ -39,6 +41,87 @@
 						<li>for-нотация для Future.
 					</ol>
 				</section>
+
+				<section>
+					<p>Зачем мы говорили о play-json?
+				</section>
+
+				<section>
+					<p>Работа с play-json - знание не слишком ценное:
+					<ul>
+						<li class="fragment">Может не пригодиться
+						<li class="fragment">Если понадобится, легко разобраться
+						по документации
+						<li class="fragment">Скорее всего устареет через пару лет
+					</ul>
+				</section>
+
+				<section>
+					<p>В прошлый раз мы изучали:
+					<ul>
+						<li class="fragment">Implicit'ы и тайпклассы
+						<li class="fragment">Функциональный подход к сериализации
+						<li class="fragment">Функциональный подход к десериализации
+						и валидации
+						<li class="fragment">Расширили знания о функторах
+						<li class="fragment">Получили базовое представление о JSON
+					</ul>
+				</section>
+
+				<section>
+					<p>Play-json для нас - только пример.
+				</section>
+
+				<section>
+					<h3>Советы по написанию классификатора</h3>
+				</section>
+
+				<section>
+					<p>Почему нет подробной инструкции?
+				</section>
+
+				<section>
+					<p>Работать с 100% известной средой – роскошь,<br> 
+					которая бывает редко.
+					<p class="fragment">Умение читать документацию, искать в google,
+					stack overflow, т.п. – полезный навык для разработчика.
+					<p class="fragment">По этому вместо инструкций – изучаем
+					теорию и причины выбора того или иного решения.
+				</section>
+
+				<section>
+					<p>Как разобрать CSV?
+
+					<ul>
+						<li>"Руками" - разбираемся с файловым вводом выводом и
+						работой со строками.
+						<li class="fragment">Ищем готовую библиотеку
+					</ul>
+				</section>
+
+				<section>
+					<p>На решение "руками" тратить время не будем.
+
+					<p>Берем вот эту библиотеку:<br> <a href="https://github.com/tototoshi/scala-csv">scala-csv</a> by Toshiyuki Takahashi
+					<p>(спасибо Никите Маслову на находку)
+				</section>
+
+				<section>
+					<p>Куда положить обучающие тексты?
+
+					<p class="fragment">Лучше всего - в ресурсы<br>
+					src/main/resources
+				</section>
+
+				<section>
+					<p>Прочитать файл из ресурсов:
+					<pre><code class="scala">
+val is = getClass.getResourceAsStream("positive.csv")
+val positive = new InputStreamReader(is)
+					</code></pre>
+					<p><small>не забывайте потом файл закрывать</small>
+				</section>
+
 				<section>
 					<h3>Потоки выполнения</h2>
 
