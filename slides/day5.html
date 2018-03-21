@@ -100,8 +100,6 @@
 				</section>
 
 				<section>
-					<p>На решение "руками" тратить время не будем.
-
 					<p>Берем вот эту библиотеку:<br> <a href="https://github.com/tototoshi/scala-csv">scala-csv</a> by Toshiyuki Takahashi
 				</section>
 
@@ -122,7 +120,82 @@ val positive = new InputStreamReader(is)
 				</section>
 
 				<section>
-					<h3>Потоки выполнения</h2>
+					<p>"Домашнее" задание: развиваем классификатор
+					<ul>
+						<li>Правки по code review
+						<li class="fragment">Добавляем нормализацию словоформ
+						<li class="fragment">Добавляем диагностику
+					</ul>
+				</section>
+
+				<section>
+					<p>Игнорируем окончания у слов.
+
+					<p>Используем готовую библиотеку - Apache Lucene
+
+					<pre><code class="scala">
+libraryDependencies += 
+  "org.apache.lucene" % "lucene-analyzers-common" % "7.2.1"
+					</code></pre>
+
+					<p><small>build.sbt</small>
+				</section>
+
+				<section>
+					<p>Создаем анализатор:
+					<pre><code class="scala">
+val analyzer = new RussianAnalyzer()
+					</code></pre>
+					<p>В комплекте - токенизатор и <a target="_blank" href="https://ru.wikipedia.org/wiki/%D0%A1%D1%82%D0%B5%D0%BC%D0%BC%D0%B5%D1%80_%D0%9F%D0%BE%D1%80%D1%82%D0%B5%D1%80%D0%B0">стеммер Портера</a>
+				</section>
+
+				<section>
+					<p>На нужно достать
+					<pre><code class="scala">
+case class Term(word: String, start: Int, end: Int)
+					</code></pre>
+				</section>
+
+				<section>
+					<pre><code class="scala">val ts = analyzer.tokenStream("text", "тестовая строка")
+ts.reset()
+
+val out = new ArrayBuffer[Term]
+
+while (ts.incrementToken()) {
+  val word = ts.getAttribute(classOf[CharTermAttribute]).toString
+
+  val offsets = ts.getAttribute(classOf[OffsetAttribute])
+
+  out += Term(word, offsets.startOffset(), offsets.endOffset())
+}
+
+out // Term(тестов,0,8), Term(строк,9,15) </code></pre>
+				</section>
+
+				<section>
+					<p>Добавляем диагностику
+
+					<p class="fragment">При классификации для каждого класса выбираем 3 характерных слова
+
+					<p class="fragment">Для итогового класса выделяем слова в тексте символами '*'
+				</section>
+
+				<section>
+					<p>Пример:
+<pre><code class="scala">
+вот вам английский язык! Выучить от сих до сих! Приеду — проверю! 
+Если *не* выучите — моргалы *выколю*, пасти *порву* и, 
+как их, эти… носы пооткушу. Ясно?!
+</code></pre>
+				</section>
+
+				<section>
+					<h2>Базовые примитивы многопоточности</h2>
+				</section>
+
+				<section>
+					<h3>Потоки выполнения</h3>
 
 					<ul>
 						<li>Каждый поток выполняется процессором независимо.
@@ -141,7 +214,7 @@ val positive = new InputStreamReader(is)
 				<section>
 					<p>В серверных проложениях часто выделяют по потоку каждому клиенту.</p>
 
-					<p>Программисту это удобно, но не всегда эффективно. В 7-й лекции
+					<p>Программисту это удобно, но не всегда эффективно. В 6-й лекции
 					поговорим об устройстве высоконагруженных приложений.</p>
 				</section>
 				<section>
@@ -275,6 +348,55 @@ public final int incrementAndGet() {
 }
 </code></pre>			
 				</section>
+
+				<section>
+					<p>Такой подход может использоваться для списков, деревьев и хеш-таблиц.
+				</section>
+
+				<section>
+					<p>Разделяемое изменяемое состояние + параллелизм = проблемы.
+				</section>
+
+				<section>
+					<p>Нет хорошего способа расставить блокировки в сложной системе.
+
+					<p class="fragment">Декомпозиция не работает - проблемы возникают в момент
+					интеграции.
+				</section>
+
+				<section>
+					<p>Качественно расставить блокировки не всегда удается:
+
+					<ul>
+						<li>Например с GUI можно работать только из выделеного потока
+						<li>Некоторые среды используют один лок на все вызовы
+					</ul>
+				</section>
+
+				<section>
+					<p>Решение: разделяемое изменяемое состояние + <s>параллелизм</s>.
+
+					<p class="fragment">Делаем всю работу в одном потоке.
+
+					<p class="fragment">Пример: СУБД Redis, веб-сервер nginx, сервер приложений node.js
+				</section>
+
+				<section>
+					<p>Решение: разделяемое <s>изменяемое</s> состояние + параллелизм.
+
+					<p class="fragment">Используем иммутабельные структуры и цепочки обработки.
+
+					<p class="fragment">Об этом сегодня и поговорим.
+				</section>
+
+				<section>
+					<p>Решение: <s>разделяемое</s> изменяемое состояние + параллелизм.
+
+					<p class="fragment">Изменяемое состояние приватное, работаем с ним из одного потока.
+
+					<p class="fragment">Это подход "Акторов", о которых поговорим на 7-м занятии.
+				</section>
+
 				<section>
 					<h3>Future[T]</h3>
 					Future - результат отложенного вычисления.
@@ -406,11 +528,39 @@ val f2: Future[Int] = Future {
 				</section>
 
 				<section>
+					<p>Future - функтор
+				</section>
+
+				<section>
+					<p>Функция map
+					<img src="fmap_just.png">
+					<p><small>источник: <a target="_blank" href="http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html">Functors, Applicatives, And Monads In Pictures</a></small>
+				</section>
+
+				<section>
+					<p>Законы функтора
+
+					<p>композиция:
+<pre><code class="scala">
+fa.map(f).map(g) = fa.map(x =&gt; g(f(x)))
+</code></pre>
+					<p>identity
+<pre><code class="scala">
+fa.map(x =&gt; x) = fa
+</code></pre>
+				</section>
+
+				<section>
+					<p>Законы для программиста - это "контракт", который обязан
+					реализовать автор функтора.
+				</section>
+
+				<section>
 					Функция map преобразует значение в Future, например:
 <pre><code class="scala">
 val f3: Future[Int] = f.map(_ * 10)
 </code></pre>
-					функция будет выполнена тогда, когда значение f будет вычислено
+					функция будет выполнена тогда, когда<br>значение f будет вычислено
 				</section>
 
 				<section>
@@ -432,12 +582,11 @@ implicit class MyFuture[T](val f: Future[T]) extends AnyVal {
 </code></pre>
 
 				</section>
+
 				<section>
-					<ul>
-						<li>flatMap[S](f: T =&gt; Future[S]): Future[S]
-						<li>transform[S](f: Try[T] =&gt; Try[S]): Future[S]
-						<li>transformWith[S](f: Try[T] =&gt; Future[S]): Future[S]
-					</ul>
+					<p>Future - монада
+<pre><code class="scala">flatMap[S](f: T =&gt; Future[S]): Future[S]
+</code></pre>
 				</section>
 
 				<section>
@@ -460,7 +609,7 @@ val count: Future[Int] =
 				</section>
 
 				<section>
-					Future - монада, для трансформаций можно использовать for:
+					<p>Можно использовать for:
 <pre><code class="scala">
 val count: Future[Int] = for {
   user &lt;- userByEmail("user1@test") if userActive(user)
@@ -473,16 +622,83 @@ val count: Future[Int] = for {
 				</section>
 
 				<section>
+					<p>Еще полезные методы
+					<ul>
+						<li>transform[S](f: Try[T] =&gt; Try[S]): Future[S]
+						<li>transformWith[S](f: Try[T] =&gt; Future[S]): Future[S]
+					</ul>
+				</section>
+
+
+				<section>
 					Совет: избегайте в своем коде таких типов как Future[Future[...]], Future[Try[...]] и Try[Future[...]].
-					Это источник проблем.
+					<br>Это источник проблем.
 				</section>
 
 				<section>
-					<p>Future - аппликативный функтор
+					<p>Сборка независимых Future
+<pre><code class="scala">
+val res: Future[Result] = for {
+  info  &lt;- getUserInfo(user)
+  stats &lt;- getUserStat(user)
+} yield Result(info, stats)
 
-					<p>TODO
+</code></pre>
 				</section>
 
+				<section>
+					<p>Проблема - задержка вызова getUserStat
+				</section>
+
+				<section>
+<pre><code class="scala">
+val infoF = getUserInfo(user)
+val statsF = getUserStat(user) 
+
+val res: Future[Result] = for {
+  info  &lt;- infoF
+  stats &lt;- statsF
+} yield Result(info, stats)
+
+</code></pre>
+				</section>
+
+				<section>
+					<p>Монада - абстракция цепочки вычислений; тут не подходит
+				</section>
+
+				<section>
+					<p>Вспомним аппликативный функтор
+				</section>
+
+				<section>
+					<p>Классическое определение:
+					<img src="applicative_just.png">
+					<p><small>источник: <a target="_blank" href="http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html">Functors, Applicatives, And Monads In Pictures</a></small>
+				</section>
+
+				<section>
+					<p>Эквивалентное определение:
+					<p>product - комбинирует два функтора<br> в функтор от пары<br>
+					<pre><code class="scala">
+def product[A, B](fa: F[A], fb: F[B]): F[(A, B)]
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Future - аппликативный функтор<br>
+					(в библиотеке Cats)
+				</section>
+
+				<section>
+					<pre><code class="scala">
+import cats.instances.future._
+import cats.syntax.all._
+
+(getUserInfo(user), getUserInfo(user)).mapN(Result.apply)
+					</code></pre>
+				</section>
+<!--
 				<section>
 					<h3>Домашнее задание</h3>
 					Реализуем при помощи Promise
@@ -492,12 +708,31 @@ val count: Future[Int] = for {
 						<li>Пишем юнит-тесты на эти функции (не менее 3-х на каждую)</li>
 					</ol>
 				</section>
+-->
+				<section>
+					<p>Дополнительно:<br> трансформер OptionT
+				</section>
 
 				<section>
-					<p>Дополнительно: OptionT
+					<p>Мы можем использовать for для Future[T] и для Option[T]
+				</section>
 
+				<section>
+					<p>Что делать с Future[Option[T]]?
+				</section>
+
+				<section>
 					<p>TODO
 				</section>
+
+				<section>
+					<p>Напоминаю:
+					<ul>
+						<li>Страничка курса: <a href="https://maxcom.github.io/scala-course/">https://maxcom.github.io/scala-course/</a>
+						<li>Посещения - отмечаем на листочке
+					</ul>
+				</section>
+
 			</div>
 
 		</div>
