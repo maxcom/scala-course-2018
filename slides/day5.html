@@ -147,7 +147,8 @@ ts.reset()
 val out = new ArrayBuffer[Term]
 
 while (ts.incrementToken()) {
-  val word = ts.getAttribute(classOf[CharTermAttribute]).toString
+  val word = 
+    ts.getAttribute(classOf[CharTermAttribute]).toString
 
   val offsets = ts.getAttribute(classOf[OffsetAttribute])
 
@@ -231,7 +232,7 @@ thread.start()
 						<li>дисковый ввод-вывод: число шпинделей жесткого диска
 						<li>и т. п.
 					</ul>
-					Верхняя граница у современных ОС - порядка 1000 нитей на процесс. Дальше не
+					Верхняя граница у современных ОС - порядка 1000 потоков на процесс. Дальше не
 					эффективно.
 				</section>
 
@@ -256,6 +257,8 @@ ec.execute(() =&gt; {
   println("Hello world!")
 })
 					</code></pre>
+					<p>В пуле задачи помещаются в очередь, задачи
+					из которой выполняются в потоках пула.
 				</section>
 
 				<section>
