@@ -759,7 +759,66 @@ val completed: Future[Seq[Int]] =
 				</section>
 
 				<section>
-					<p>TODO
+					<p>Что мы хотим? 
+					<ul>
+						<li class="fragment">Асинхронное выполнение, как у Future
+						<li class="fragment">Выполнять операции пока не возникнет None,<br> как у Option
+					</ul>
+				</section>
+
+				<section>
+					<p>Универсального способа объединить две монады нет.
+				</section>
+
+				<section>
+					<p>Но можно сделать такой flatMap:
+					<pre><code class="scala">
+class FutureO[+A](val future: Future[Option[A]]) extends AnyVal {
+  def flatMap[B](f: A ⇒ FutureO[B])
+                (implicit ec: ExecutionContext): FutureO[B] = {
+    val newFuture = future.flatMap {
+      case Some(a) ⇒ f(a).future
+      case None    ⇒ Future.successful(None)
+    }
+    new FutureO(newFuture)
+  }
+}					
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Что в этом коде от Option?
+
+					<p class="fragment">Логика работы.
+				</section>
+
+				<section>
+					<p>Что в этом коде от Future?
+
+					<p class="fragment">flatMap и функция создания
+
+					<p class="fragment">На месте Future может быть любая другая монада.
+				</section>
+
+				<section>
+					<p>В библиотеке cats есть трансформер OptionT
+					<pre><code class="scala">
+val greetingFO: Future[Option[String]] = ???
+val firstnameF: Future[String] = ???
+val lastnameO: Option[String] = ???
+
+val ot: OptionT[Future, String] = for {
+  g &lt;- OptionT(greetingFO)
+  f &lt;- OptionT.liftF(firstnameF)
+  l &lt;- OptionT.fromOption[Future](lastnameO)
+} yield s"$g $f $l"
+
+val result: Future[Option[String]] = ot.value
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Трансформеры есть и для некоторых других монад.
 				</section>
 
 				<section>
