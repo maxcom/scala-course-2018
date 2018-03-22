@@ -216,6 +216,9 @@ thread.start()
 
 				<section>
 					<h3>Пулы потоков</h3>
+				</section>
+
+				<section>
 					<p>Явно потоки (почти) никогда не нужно создавать:
 					<ul>
 						<li>создание потока - "дорогая" операция
@@ -300,9 +303,32 @@ lock.synchronized {
 				</section>
 
 				<section>
+					<pre><code style="scala">
+val lock = new ReentrantReadWriteLock()
+var data = Vector(42)
+
+def readData(): Vector[Int] = {
+  try {
+    lock.readLock().tryLock(1, TimeUnit.MINUTES)
+
+    data
+  } finally {
+    lock.readLock().unlock()
+  }
+}
+					</code></pre>
+				</section>
+
+				<section>
 					<h4>Deadlock</h4>
 					<p>Если брать lock'и в разном порядке в разных потоках можно получить взаимную
 					блокировку, из которой не выйти.
+				</section>
+
+				<section>
+					<p>Dealock'ы бывают хитрые, но сводятся к той же схеме.
+
+					<p class="fragment">Пример: извлечение объектов парами из ограниченного пула.
 				</section>
 
 				<section>
@@ -347,7 +373,12 @@ public final int incrementAndGet() {
 				<section>
 					<p>Нет хорошего способа расставить блокировки в сложной системе.
 
-					<p class="fragment">Декомпозиция не работает - проблемы возникают в момент
+					<p class="fragment">Разделяемое состояние требует "протокола" доступа,
+					который нужно разработать и потом ему следовать.
+				</section>
+
+				<section>
+					<p>Декомпозиция не работает - проблемы возникают в момент
 					интеграции.
 				</section>
 
@@ -373,7 +404,7 @@ public final int incrementAndGet() {
 
 					<p class="fragment">Используем иммутабельные структуры и цепочки обработки.
 
-					<p class="fragment">Об этом сегодня и поговорим.
+					<p class="fragment">Сегодня об этом поговорим, продолжим на 8-м занятии.
 				</section>
 
 				<section>
@@ -519,9 +550,9 @@ val f2: Future[Int] = Future {
 				</section>
 
 				<section>
-					<p>Функция map
-					<img src="fmap_just.png">
-					<p><small>источник: <a target="_blank" href="http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html">Functors, Applicatives, And Monads In Pictures</a></small>
+					<p>Функция map<br>
+					<img src="catfunctor.png">
+					<p><small>источник: <a target="_blank" href="https://buzzdecafe.github.io/code/2014/10/26/functors-and-applicatives">Functors and Applicatives</a></small>
 				</section>
 
 				<section>
@@ -659,9 +690,9 @@ val res: Future[Result] = for {
 				</section>
 
 				<section>
-					<p>Классическое определение:
-					<img src="applicative_just.png">
-					<p><small>источник: <a target="_blank" href="http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html">Functors, Applicatives, And Monads In Pictures</a></small>
+					<p>Классическое определение - функция ap:
+					<img src="apply.png">
+					<p><small>источник: <a target="_blank" href="https://buzzdecafe.github.io/code/2014/10/26/functors-and-applicatives">Functors and Applicatives</a></small>
 				</section>
 
 				<section>
@@ -684,6 +715,25 @@ import cats.syntax.all._
 
 (getUserInfo(user), getUserInfo(user)).mapN(Result.apply)
 					</code></pre>
+				</section>
+
+				<section>
+					<p>Future.sequence для списков
+
+					<pre><code class="scala">
+def process(i: Int): Future[Int] = ???
+
+val processed: Seq[Future[Int]] = 
+  Seq(1, 2, 3).map(process)
+
+val completed: Future[Seq[Int]] = 
+  Future.sequence(processed)
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Future.sequence может быть опасен - загружает очередь пула потоков
+					и может "перегрузить" process()
 				</section>
 <!--
 				<section>
