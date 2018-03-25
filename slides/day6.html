@@ -547,6 +547,34 @@ while ({ task = queue.poll(); task } != null) {
 				</section>
 
 				<section>
+					<p>Выбираем версию sbt: project/build.properties
+<pre><code class="scala">sbt.version=1.1.1
+</code></pre>
+				</section>
+
+				<section>
+					<p>Создаем project/plugins.sbt
+<pre><code class="scala">
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.6.12")
+
+</code></pre>
+				</section>
+
+				<section>
+					<p>Включаем Play и используем стандартные пути файлов:
+<pre><code class="scala">
+enablePlugins(PlayScala)
+disablePlugins(PlayLayoutPlugin)
+
+PlayKeys.playMonitoredFiles ++= 
+  (sourceDirectories in 
+    (Compile, TwirlKeys.compileTemplates)).value
+
+</code></pre>
+				<p>build.sbt
+				</section>
+
+				<section>
 					<p>TODO
 				</section>
 
