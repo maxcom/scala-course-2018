@@ -25,7 +25,7 @@
 		<div class="reveal">
 			<div class="slides">
 				<section>
-					<h2>Часть 6. HTTP протокол. Архитектура высоконагруженных приложений. Play Framework.</h2>
+					<h3>Часть 6. HTTP протокол. Архитектура высоконагруженных приложений. Play Framework.</h3>
 					<p><small>Страничка курса: <a href="https://maxcom.github.io/scala-course/">https://maxcom.github.io/scala-course/</small></a>
 				</section>
 
@@ -41,7 +41,45 @@
 
 				<section>
 					<h3>HTTP протокол</h3>
+				</section>
 
+				<section>
+					<p>Протокол передачи данных, придуманный для Web.
+
+					<p class="fragment">Кроме front-end, используется для взаимодействия
+					сервисов между собой.
+				</section>
+
+				<section>
+					<p>Схема "запрос-ответ".
+					<p class="fragment">Сервер ожидает соединений клиентов.
+					<p class="fragment">Сервер получает запрос и формирует ответ.
+				</section>
+
+				<section>
+					<p>В одном соединении запросы обрабатываются последовательно.
+					<p>Клиент может открыть несколько соединений к серверу (браузеры - до 6).
+				</section>
+
+				<section>
+					<p>Запрос состоит из:
+					<ul>
+						<li>Строки запроса
+						<li>Заголовков (метаданных)
+						<li>Тела запроса (опционально)
+					</ul>
+				</section>
+
+				<section>
+					<p>Ответ состоит из
+					<ul>
+						<li>Строки ответа
+						<li>Заголовков
+						<li>Тела ответа (тоже опционально)
+					</ul>
+				</section>
+
+				<section>
 					<p>TODO
 				</section>
 
