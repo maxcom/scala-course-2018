@@ -80,6 +80,69 @@
 				</section>
 
 				<section>
+					<p>Строка запроса
+					<pre><code class="scala">
+GET /scala-course/slides/day6.html HTTP/1.1
+					</code></pre>
+					<p>Метод, путь ресурса и версия протокола
+				</section>
+
+				<section>
+					<p>Путь - "адрес" ресурса на сервере;<br>"метод" - действие над ресурсом
+				</section>
+
+				<section>
+					<p>Основные методы:
+					<ul>
+						<li>GET - получить
+						<li>POST - отправить данные
+						<li>PUT - поместить
+						<li>DELETE - удалить
+						<li>PATCH - модифицировать
+					</ul>
+					<p>Всего около 20 методов, если включить все расширения
+				</section>
+
+				<section>
+					<p>Заголовки запроса:
+					<ul>
+						<li>Описывают возможности и предпочтения клиента
+						<li>Наличие и состав тела запроса
+						<li>Наличие данных в кеше
+						<li>Cookies
+						<li>Другие модификаторы, например получение с нужного смещения
+					</ul>
+				</section>
+
+				<section>
+					<pre><code class="http">
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+Accept-Encoding: gzip, deflate, br
+Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
+Cache-Control: max-age=0
+If-Modified-Since: Sun, 25 Mar 2018 07:25:21 GMT
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36
+					</code></pre>
+					<p><small>Переносы строк запрещены в современном HTTP</small>
+				</section>
+
+				<section>
+					<p>Тело запроса: данные, передаваемые на сервер
+				</section>
+
+				<section>
+					<p>Тело - данные запроса, поля формы, загружаемые данные и т.п.
+
+					<p class="fragment">Тело может быть почти у любого метода, даже у GET (см. 
+					<a href="https://tools.ietf.org/html/rfc7231#section-4.3.1" target="_blank">RFC 7231</a>, раздел 4.3.1).
+				</section>
+
+				<section>
+					<p>Два режима передачи тела: известной длины и неизвестной (chunked).
+				</section>
+
+				<section>
 					<p>TODO
 				</section>
 
