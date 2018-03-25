@@ -343,15 +343,15 @@ while (true) { // упрощенный вариант сервера
 				</section>
 
 				<section>
-					<p>Java IO - потоковые чтение/запись (stream, не путаем с thread!)
+					<p>Java IO - потоковые чтение/запись
 					<p>Java NIO - блочные чтение/запись
 				</section>
 
 				<section>
-					Блочный I/O оптимальнее потокового, он избегает лишних копирований
+					<p>Блочный I/O оптимальнее потокового, он избегает лишних копирований
 					и преобразований данных.
 
-					Нам NIO интересен тем, что только в нем есть неблокирующий ввод-вывод.
+					<p>Нам NIO интересен тем, что только в нем есть неблокирующий ввод-вывод.
 				</section>
 
 				<section>
@@ -378,7 +378,7 @@ socketChannel.configureBlocking(false)
   executor.execute { () ⇒
     val buffer: ByteBuffer = ByteBuffer.wrap(greetings)
 
-    while (buffer.hasRemaining) {
+    while (buffer.hasRemaining) { // busy wait - плохая идея
       socket.write(buffer)
     }
 
@@ -510,7 +510,7 @@ while ({ task = queue.poll(); task } != null) {
 				</section>
 
 				<section>
-					Итого мы получили:
+					<p>Итого мы получили:
 
 					<ul>
 						<li>event loop для эффективного ввода-вывода
@@ -521,7 +521,12 @@ while ({ task = queue.poll(); task } != null) {
 				</section>
 
 				<section>
-					<h3>Play Framework: создаем приложение.
+					<p>Все современные сервера на JVM реализуют комбинированный
+					подход.
+				</section>
+
+				<section>
+					<h3>Play Framework: создаем приложение
 				</section>
 
 				<section>
