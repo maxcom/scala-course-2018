@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>Архитектура высоконагруженных приложений</title>
+		<title>HTTP Протокол. Архитектура высоконагруженных приложений. Play Framework.</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
 		<link rel="stylesheet" href="css/theme/moon.css">
@@ -25,22 +25,38 @@
 		<div class="reveal">
 			<div class="slides">
 				<section>
-					<h2>Часть 6. Архитектура высоконагруженных приложений</h2>
+					<h2>Часть 6. HTTP протокол. Архитектура высоконагруженных приложений. Play Framework.</h2>
 					<p><small>Страничка курса: <a href="https://maxcom.github.io/scala-course/">https://maxcom.github.io/scala-course/</small></a>
 				</section>
 
 				<section>
 					<h3>План</h2>
 					<ol>
-						<li>Каждому клиенту по потоку
-						<li>Все клиенты в одном потоке: примеры
-						<li>Введение в Java NIO
-						<li>Event Loop
-						<li>Совмещаем event loop и многопоточность
+						<li>HTTP протокол и REST.
+						<li>Архитектура обработки запросов.
+						<li>Play Framework: создаем приложение.
+						<li>Практическое задание: создаем сервис классификации.
 					</ol>
 				</section>
+
 				<section>
-					<h3>Каждому клиенту по потоку</h3>
+					<h3>HTTP протокол</h3>
+
+					<p>TODO
+				</section>
+
+				<section>
+					<h3>REST API</h3>
+
+					<p>TODO
+				</section>
+
+				<section>
+					<h3>Архитектура обработки запросов.</h3>
+				</section>
+
+				<section>
+					<h4>Каждому клиенту по потоку</h4>
 					Самая простая модель: основной поток принимает соединения и передает
 					обработку "рабочим" потокам.
 				</section>
@@ -199,14 +215,14 @@ while (buffer.hasRemaining) {
 				</section>
 
 				<section>
-					<h2>Event Loop - используем один Selector на всех клиентов</h2>
+					<h3>Event Loop - используем один Selector на всех клиентов</h3>
 				</section>
 
 				<section>
 <pre><code class="scala">val selector: Selector = Selector.open()
 
 serverSocket.register(selector, SelectionKey.OP_ACCEPT, 
-  () -> println("Got new connection"))
+  () -&gt; println("Got new connection"))
 
 while (true) {
   selector.select()
@@ -238,7 +254,7 @@ while (true) {
 				</section>
 
 				<section>
-					<h2>Комбинируем потоки и Event Loop</h2>
+					<h3>Комбинируем потоки и Event Loop</h3>
 				</section>
 
 				<section>
@@ -309,23 +325,17 @@ while ({ task = queue.poll(); task } != null) {
 				</section>
 
 				<section>
-					<h2>Домашнее задание</h2>
-					Пишем простой HTTP сервер, который будет
-					на любой запрос отдавать один файл с диска.
+					<h3>Play Framework: создаем приложение.
 				</section>
 
 				<section>
-					<p>Запросы не разбираем
-					<p>Считаем что все запросы без "тела"
-					<p>Признак конца запроса - два перевода строки подряд (CR LF CR LF)
+					<p>TODO
 				</section>
 
 				<section>
-					Тестируем результат при помощи Apache Benchmark
-
-					<p>В Linux есть в дистрибутива; в macOS - в системе; для Windows - 
-					   в составе дистрибутива Apache
+					<p>Практическое задание: создаем сервис классификации.
 				</section>
+
 			</div>
 
 		</div>
