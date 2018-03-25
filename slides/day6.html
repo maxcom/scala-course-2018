@@ -51,6 +51,20 @@
 				</section>
 
 				<section>
+					<p>Две "живых" версии стандарта:
+
+					<ul>
+						<li>HTTP 1.1, 1999 год; последняя редакция 2014 года (см. 
+						<a target="_blank" href="https://www.mnot.net/blog/2014/06/07/rfc2616_is_dead">RFC2616 Is Dead</a>).
+						<li>HTTP 2.0, 2015 год - новый транспортный слой
+					</ul>
+				</section>
+
+				<section>
+					<p>Будем говорить про HTTP/1.1
+				</section>
+
+				<section>
 					<p>Схема "запрос-ответ".
 					<p class="fragment">Сервер ожидает соединений клиентов.
 					<p class="fragment">Сервер получает запрос и формирует ответ.
@@ -143,17 +157,98 @@ User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (
 				</section>
 
 				<section>
-					<p>TODO
+					<p>Строка ответа
+					<pre><code class="scala">
+HTTP/1.1 200 OK
+					</code></pre>
+					<p>Версия протокола и статус ответа
+				</section>
+
+				<section>
+					<p>Статус - трехзначный код плюс его описание
+
+					<ul>
+						<p>1xx - информационные коды
+						<p>2xx - успешные коды
+						<p>3xx - перенаправления
+						<p>4xx - ошибки клиента
+						<p>5xx - ошибки сервера
+					</ul>
+
+					<p><small>Хороший справочник по кодам - в английской
+					<a target="_blank" href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes">википедии</a></small>.
+				</section>
+
+				<section>
+					<p>Заголовки ответа
+					<ul>
+						<li>Свойства получаемого ресурса - тип данных,
+						кешируемость, размер, язык и т.п.
+						<li>Режимы передачи - сжатие, chunked и т.п.
+						<li>Установка Cookies
+						<li>Security-заголовки
+					</ul>
+				</section>
+
+				<section>
+					<pre><code class="http">Server: QRATOR
+Date: Sun, 25 Mar 2018 08:57:43 GMT
+Content-Type: text/html;charset=utf-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+Keep-Alive: timeout=15
+Set-Cookie: CSRF_TOKEN="GjxRyqELgF6WoDWtvm3dMQ=="; Version=1; Max-Age=64281600; Expires=Tue, 07-Apr-2020 08:57:43 GMT; Path=/
+Cache-Control: private
+Strict-Transport-Security: max-age=7776000
+X-Content-Type-Options: nosniff
+X-Frame-Options: SAMEORIGIN
+Expires: Sat, 24 Mar 2018 12:57:43 GMT
+Last-Modified: Sun, 25 Mar 2018 08:57:41 GMT
+Set-Cookie: JSESSIONID=1485581EB69CB469B9E766D8DCEF4652; Path=/; Secure; HttpOnly
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Тело ответа - содержимое ресурса
+
+					<ul>
+						<li>Известного размера
+						<li>Chunked
+						<li>Ограничено соединением (устаревшее из HTTP/1.0)
+					</ul>
 				</section>
 
 				<section>
 					<h3>REST API</h3>
-
-					<p>TODO
 				</section>
 
 				<section>
-					<h3>Архитектура обработки запросов.</h3>
+					<p>REST - методика создания API поверх протокола HTTP
+				</section>
+
+				<section>
+					<p>"REST" как функционально программирование - его все любят,
+					но никто точно не знает что это такое.
+				</section>
+
+				<section>
+					Обычно под REST понимают следующее:
+
+					<ul>
+						<li>Отсутствие состояния клиента на сервере
+						<li class="fragment">URI, указывающие на объекты API
+						<li class="fragment">Методы HTTP - действия над объектами
+						<li class="fragment">Использование кеширования и условных запросов
+						<li class="fragment">Content-type для выбора формата и версионирования
+					</ul>
+				</section>
+
+				<section>
+					<p>Подробнее рассмотрим позже<br> на примере Play Framework
+				</section>
+
+				<section>
+					<h3>Архитектура обработки запросов</h3>
 				</section>
 
 				<section>
