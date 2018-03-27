@@ -543,12 +543,14 @@ while ({ task = queue.poll(); task } != null) {
 				</section>
 
 				<section>
-					<p>Добавляем Play в проект
+					<p>Добавляем Play в готовый проект
+
+					<p>(создать проект с "нуля" проще - см. <a target="_blank" href="https://www.playframework.com/documentation/2.6.x/NewApplication">документацию</a>)
 				</section>
 
 				<section>
 					<p>Выбираем версию sbt: project/build.properties
-<pre><code class="scala">sbt.version=1.1.1
+<pre><code class="scala">sbt.version=1.1.2
 </code></pre>
 				</section>
 
@@ -563,6 +565,8 @@ addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.6.12")
 				<section>
 					<p>Включаем Play и используем стандартные пути файлов:
 <pre><code class="scala">
+libraryDependencies += guice
+
 enablePlugins(PlayScala)
 disablePlugins(PlayLayoutPlugin)
 
@@ -572,6 +576,19 @@ PlayKeys.playMonitoredFiles ++=
 
 </code></pre>
 				<p>build.sbt
+				</section>
+
+				<section>
+					<p>Создаем пустой конфиг src/main/resources/application.conf
+				</section>
+
+				<section>
+					<p>Отключаем фильтры по-умолчанию в application.conf:
+<pre><code class="scala">
+play.filters.disabled+=play.filters.hosts.AllowedHostsFilter
+</code></pre>
+					<p>В демо-проекте они нам не нужны, в реальной жизни
+					их нужно настроить
 				</section>
 
 				<section>
