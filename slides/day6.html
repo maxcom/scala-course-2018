@@ -32,219 +32,11 @@
 				<section>
 					<h3>План</h2>
 					<ol>
-						<li>HTTP протокол и REST.
 						<li>Архитектура обработки запросов.
+						<li>HTTP протокол и REST.
 						<li>Play Framework: создаем приложение.
 						<li>Практическое задание: создаем сервис классификации.
 					</ol>
-				</section>
-
-				<section>
-					<h3>HTTP протокол</h3>
-				</section>
-
-				<section>
-					<p>Протокол передачи данных, придуманный для Web.
-
-					<p class="fragment">Кроме front-end, используется для взаимодействия
-					сервисов между собой.
-				</section>
-
-				<section>
-					<p>Две "живых" версии стандарта:
-
-					<ul>
-						<li>HTTP 1.1, 1999 год; последняя редакция 2014 года (см. 
-						<a target="_blank" href="https://www.mnot.net/blog/2014/06/07/rfc2616_is_dead">RFC2616 Is Dead</a>).
-						<li>HTTP 2.0, 2015 год - новый транспортный слой
-					</ul>
-				</section>
-
-				<section>
-					<p>Будем говорить про HTTP/1.1
-				</section>
-
-				<section>
-					<p>Схема "запрос-ответ".
-					<p class="fragment">Сервер ожидает соединений клиентов.
-					<p class="fragment">Сервер получает запрос и формирует ответ.
-				</section>
-
-				<section>
-					<p>В одном соединении запросы обрабатываются последовательно.
-					<p>Клиент может открыть несколько соединений к серверу (браузеры - до 6).
-				</section>
-
-				<section>
-					<p>Запрос состоит из:
-					<ul>
-						<li>Строки запроса
-						<li>Заголовков (метаданных)
-						<li>Тела запроса (опционально)
-					</ul>
-				</section>
-
-				<section>
-					<p>Ответ состоит из
-					<ul>
-						<li>Строки ответа
-						<li>Заголовков
-						<li>Тела ответа (тоже опционально)
-					</ul>
-				</section>
-
-				<section>
-					<p>Строка запроса
-					<pre><code class="scala">
-GET /scala-course/slides/day6.html HTTP/1.1
-					</code></pre>
-					<p>Метод, путь ресурса и версия протокола
-				</section>
-
-				<section>
-					<p>Путь - "адрес" ресурса на сервере;<br>"метод" - действие над ресурсом
-				</section>
-
-				<section>
-					<p>Основные методы:
-					<ul>
-						<li>GET - получить
-						<li>POST - отправить данные
-						<li>PUT - поместить
-						<li>DELETE - удалить
-						<li>PATCH - модифицировать
-					</ul>
-					<p>Всего около 20 методов, если включить все расширения
-				</section>
-
-				<section>
-					<p>Заголовки запроса:
-					<ul>
-						<li>Описывают возможности и предпочтения клиента
-						<li>Наличие и состав тела запроса
-						<li>Наличие данных в кеше
-						<li>Cookies
-						<li>Другие модификаторы, например получение с нужного смещения
-					</ul>
-				</section>
-
-				<section>
-					<pre><code class="http">
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
-Accept-Encoding: gzip, deflate, br
-Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
-Cache-Control: max-age=0
-If-Modified-Since: Sun, 25 Mar 2018 07:25:21 GMT
-Upgrade-Insecure-Requests: 1
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36
-					</code></pre>
-					<p><small>Переносы строк запрещены в современном HTTP</small>
-				</section>
-
-				<section>
-					<p>Тело запроса: данные, передаваемые на сервер
-				</section>
-
-				<section>
-					<p>Тело - данные запроса, поля формы, загружаемые данные и т.п.
-
-					<p class="fragment">Тело может быть почти у любого метода, даже у GET (см. 
-					<a href="https://tools.ietf.org/html/rfc7231#section-4.3.1" target="_blank">RFC 7231</a>, раздел 4.3.1).
-				</section>
-
-				<section>
-					<p>Два режима передачи тела: известной длины и неизвестной (chunked).
-				</section>
-
-				<section>
-					<p>Строка ответа
-					<pre><code class="scala">
-HTTP/1.1 200 OK
-					</code></pre>
-					<p>Версия протокола и статус ответа
-				</section>
-
-				<section>
-					<p>Статус - трехзначный код плюс его описание
-
-					<ul>
-						<p>1xx - информационные коды
-						<p>2xx - успешные коды
-						<p>3xx - перенаправления
-						<p>4xx - ошибки клиента
-						<p>5xx - ошибки сервера
-					</ul>
-
-					<p><small>Хороший справочник по кодам - в английской
-					<a target="_blank" href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes">википедии</a></small>.
-				</section>
-
-				<section>
-					<p>Заголовки ответа
-					<ul>
-						<li>Свойства получаемого ресурса - тип данных,
-						кешируемость, размер, язык и т.п.
-						<li>Режимы передачи - сжатие, chunked и т.п.
-						<li>Установка Cookies
-						<li>Security-заголовки
-					</ul>
-				</section>
-
-				<section>
-					<pre><code class="http">Server: QRATOR
-Date: Sun, 25 Mar 2018 08:57:43 GMT
-Content-Type: text/html;charset=utf-8
-Transfer-Encoding: chunked
-Connection: keep-alive
-Keep-Alive: timeout=15
-Set-Cookie: CSRF_TOKEN="GjxRyqELgF6WoDWtvm3dMQ=="; Version=1; Max-Age=64281600; Expires=Tue, 07-Apr-2020 08:57:43 GMT; Path=/
-Cache-Control: private
-Strict-Transport-Security: max-age=7776000
-X-Content-Type-Options: nosniff
-X-Frame-Options: SAMEORIGIN
-Expires: Sat, 24 Mar 2018 12:57:43 GMT
-Last-Modified: Sun, 25 Mar 2018 08:57:41 GMT
-Set-Cookie: JSESSIONID=1485581EB69CB469B9E766D8DCEF4652; Path=/; Secure; HttpOnly
-					</code></pre>
-				</section>
-
-				<section>
-					<p>Тело ответа - содержимое ресурса
-
-					<ul>
-						<li>Известного размера
-						<li>Chunked
-						<li>Ограничено соединением (устаревшее из HTTP/1.0)
-					</ul>
-				</section>
-
-				<section>
-					<h3>REST API</h3>
-				</section>
-
-				<section>
-					<p>REST - методика создания API поверх протокола HTTP
-				</section>
-
-				<section>
-					<p>"REST" как функционально программирование - его все любят,
-					но никто точно не знает что это такое.
-				</section>
-
-				<section>
-					Обычно под REST понимают следующее:
-
-					<ul>
-						<li>Отсутствие состояния клиента на сервере
-						<li class="fragment">URI, указывающие на объекты API
-						<li class="fragment">Методы HTTP - действия над объектами
-						<li class="fragment">Использование кеширования и условных запросов
-						<li class="fragment">Content-type для выбора формата и версионирования
-					</ul>
-				</section>
-
-				<section>
-					<p>Подробнее рассмотрим позже<br> на примере Play Framework
 				</section>
 
 				<section>
@@ -271,6 +63,7 @@ while (true) { // упрощенный вариант сервера
   }
 }</code></pre>
 				</section>
+
 				<section>
 					Проблемы кода из примера:
 					<ul>
@@ -523,6 +316,215 @@ while ({ task = queue.poll(); task } != null) {
 				<section>
 					<p>Все современные сервера на JVM реализуют комбинированный
 					подход.
+				</section>
+
+
+				<section>
+					<h3>HTTP протокол</h3>
+				</section>
+
+				<section>
+					<p>Протокол передачи данных, придуманный для Web.
+
+					<p class="fragment">Кроме front-end, используется для взаимодействия
+					сервисов между собой.
+				</section>
+
+				<section>
+					<p>Две "живых" версии стандарта:
+
+					<ul>
+						<li>HTTP 1.1, 1999 год; последняя редакция 2014 года (см. 
+						<a target="_blank" href="https://www.mnot.net/blog/2014/06/07/rfc2616_is_dead">RFC2616 Is Dead</a>).
+						<li>HTTP 2.0, 2015 год - новый транспортный слой
+					</ul>
+				</section>
+
+				<section>
+					<p>Будем говорить про HTTP/1.1
+				</section>
+
+				<section>
+					<p>Схема "запрос-ответ".
+					<p class="fragment">Сервер ожидает соединений клиентов.
+					<p class="fragment">Сервер получает запрос и формирует ответ.
+				</section>
+
+				<section>
+					<p>В одном соединении запросы обрабатываются последовательно.
+					<p>Клиент может открыть несколько соединений к серверу (браузеры - до 6).
+				</section>
+
+				<section>
+					<p>Запрос состоит из:
+					<ul>
+						<li>Строки запроса
+						<li>Заголовков (метаданных)
+						<li>Тела запроса (опционально)
+					</ul>
+				</section>
+
+				<section>
+					<p>Ответ состоит из
+					<ul>
+						<li>Строки ответа
+						<li>Заголовков
+						<li>Тела ответа (тоже опционально)
+					</ul>
+				</section>
+
+				<section>
+					<p>Строка запроса
+					<pre><code class="scala">
+GET /scala-course/slides/day6.html HTTP/1.1
+					</code></pre>
+					<p>Метод, путь ресурса и версия протокола
+				</section>
+
+				<section>
+					<p>Путь - "адрес" ресурса на сервере;<br>"метод" - действие над ресурсом
+				</section>
+
+				<section>
+					<p>Основные методы:
+					<ul>
+						<li>GET - получить
+						<li>POST - отправить данные
+						<li>PUT - поместить
+						<li>DELETE - удалить
+						<li>PATCH - модифицировать
+					</ul>
+					<p>Всего около 20 методов, если включить все расширения
+				</section>
+
+				<section>
+					<p>Заголовки запроса:
+					<ul>
+						<li>Описывают возможности и предпочтения клиента
+						<li>Наличие и состав тела запроса
+						<li>Наличие данных в кеше
+						<li>Cookies
+						<li>Другие модификаторы, например получение с нужного смещения
+					</ul>
+				</section>
+
+				<section>
+					<pre><code class="http">
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+Accept-Encoding: gzip, deflate, br
+Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
+Cache-Control: max-age=0
+If-Modified-Since: Sun, 25 Mar 2018 07:25:21 GMT
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36
+					</code></pre>
+					<p><small>Переносы строк запрещены в современном HTTP</small>
+				</section>
+
+				<section>
+					<p>Тело запроса: данные, передаваемые на сервер
+				</section>
+
+				<section>
+					<p>Тело - данные запроса, поля формы, загружаемые данные и т.п.
+
+					<p class="fragment">Тело может быть почти у любого метода, даже у GET (см. 
+					<a href="https://tools.ietf.org/html/rfc7231#section-4.3.1" target="_blank">RFC 7231</a>, раздел 4.3.1).
+				</section>
+
+				<section>
+					<p>Два режима передачи тела: известной длины и неизвестной (chunked).
+				</section>
+
+				<section>
+					<p>Строка ответа
+					<pre><code class="scala">
+HTTP/1.1 200 OK
+					</code></pre>
+					<p>Версия протокола и статус ответа
+				</section>
+
+				<section>
+					<p>Статус - трехзначный код плюс его описание
+
+					<ul>
+						<p>1xx - информационные коды
+						<p>2xx - успешные коды
+						<p>3xx - перенаправления
+						<p>4xx - ошибки клиента
+						<p>5xx - ошибки сервера
+					</ul>
+
+					<p><small>Хороший справочник по кодам - в английской
+					<a target="_blank" href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes">википедии</a></small>.
+				</section>
+
+				<section>
+					<p>Заголовки ответа
+					<ul>
+						<li>Свойства получаемого ресурса - тип данных,
+						кешируемость, размер, язык и т.п.
+						<li>Режимы передачи - сжатие, chunked и т.п.
+						<li>Установка Cookies
+						<li>Security-заголовки
+					</ul>
+				</section>
+
+				<section>
+					<pre><code class="http">Server: QRATOR
+Date: Sun, 25 Mar 2018 08:57:43 GMT
+Content-Type: text/html;charset=utf-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+Keep-Alive: timeout=15
+Set-Cookie: CSRF_TOKEN="GjxRyqELgF6WoDWtvm3dMQ=="; Version=1; Max-Age=64281600; Expires=Tue, 07-Apr-2020 08:57:43 GMT; Path=/
+Cache-Control: private
+Strict-Transport-Security: max-age=7776000
+X-Content-Type-Options: nosniff
+X-Frame-Options: SAMEORIGIN
+Expires: Sat, 24 Mar 2018 12:57:43 GMT
+Last-Modified: Sun, 25 Mar 2018 08:57:41 GMT
+Set-Cookie: JSESSIONID=1485581EB69CB469B9E766D8DCEF4652; Path=/; Secure; HttpOnly
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Тело ответа - содержимое ресурса
+
+					<ul>
+						<li>Известного размера
+						<li>Chunked
+						<li>Ограничено соединением (устаревшее из HTTP/1.0)
+					</ul>
+				</section>
+
+				<section>
+					<h3>REST API</h3>
+				</section>
+
+				<section>
+					<p>REST - методика создания API поверх протокола HTTP
+				</section>
+
+				<section>
+					<p>"REST" как функционально программирование - его все любят,
+					но никто точно не знает что это такое.
+				</section>
+
+				<section>
+					Обычно под REST понимают следующее:
+
+					<ul>
+						<li>Отсутствие состояния клиента на сервере
+						<li class="fragment">URI, указывающие на объекты API
+						<li class="fragment">Методы HTTP - действия над объектами
+						<li class="fragment">Использование кеширования и условных запросов
+						<li class="fragment">Content-type для выбора формата и версионирования
+					</ul>
+				</section>
+
+				<section>
+					<p>Подробнее рассмотрим позже<br> на примере Play Framework
 				</section>
 
 				<section>
