@@ -14,7 +14,7 @@ layout: default
 * [Часть 4. Implicit значения и преобразования. Тайпклассы. Чтение и запись JSON в play-json.](slides/day4.html) 15 марта. [Видео](https://youtu.be/tkgQYnO5v3o). [Версия для печати](slides/day4.html?print-pdf).
 * [Часть 5. Базовые примитивы многопоточности](slides/day5.html). 22 марта. [Видео](https://youtu.be/pbeuOGMJqds). [Версия для печати](slides/day5.html?print-pdf).
 
-* [Часть 6. HTTP Протокол. Архитектура высоконагруженных приложений. Play Framework.](slides/day6.html) Практическое задание: пишем сервис. 29 марта. [Версия для печати](slides/day6.html?print-pdf).
+* [Часть 6. HTTP Протокол. Play Framework. Архитектура высоконагруженных приложений.](slides/day6.html) Практическое задание: пишем сервис. 29 марта. [Версия для печати](slides/day6.html?print-pdf).
 * [Часть 7. Акторы Akka.](slides/day7.html) Практическое задание: REST-клиент и отслеживание новых записей. 5 апреля. [Версия для печати](slides/day7.html?print-pdf).
 * Часть 8. Akka Persistence и Akka Streams. Практическое задание: сохранение состояния и realtime обновление. 12 апреля.
 * Часть 9. Подводим итоги и разбор кода практического задания. 19 апреля.
