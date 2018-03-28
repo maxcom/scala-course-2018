@@ -32,6 +32,7 @@
 				<section>
 					<h3>План</h2>
 					<ol>
+						<li>Статус по практическому заданию
 						<li>Архитектура обработки запросов.
 						<li>HTTP протокол и REST.
 						<li>Play Framework: создаем приложение.
@@ -40,7 +41,20 @@
 				</section>
 
 				<section>
+					<h3>Статус по практическому заданию</h3>
+					<p>TODO
+				</section>
+
+				<section>
 					<h3>Архитектура обработки запросов</h3>
+				</section>
+
+				<section>
+					<p>Рассмотрим протоколы, в которых клиент
+					открывает tcp соединение с сервером и они
+					обмениваются запросами/сообщениями.
+
+					<p class="fragment">Это HTTP, SMTP, XMPP и многие другие.
 				</section>
 
 				<section>
@@ -58,6 +72,7 @@ val greetings: Array[Byte] =
 while (true) { // упрощенный вариант сервера
   val socket: Socket = serverSocket.accept()
   executor.execute { () ⇒
+    // блокирующийся ввод-вывод
     socket.getOutputStream.write(greetings)
     socket.close()
   }
@@ -75,9 +90,7 @@ while (true) { // упрощенный вариант сервера
 				<section>
 					<h4>Проблемы подхода (1/3)</h4>
 
-					Потоков много быть не может.
-
-					"Пассивные" клиенты занимают потоки:
+					<p>"Пассивные" клиенты занимают потоки:
 					<ul>
 						<li>Когда держат соединения между запросами
 						<li>Когда читают ответ на своем медленном канале
@@ -88,13 +101,13 @@ while (true) { // упрощенный вариант сервера
 				<section>
 					<h4>Проблемы подхода (2/3)</h4>
 
-					Не предполагает распараллеливания обработки одного запроса
+					<p>Не предполагает распараллеливания обработки одного запроса
 				</section>
 
 				<section>
 					<h4>Проблемы подхода (3/3)</h4>
 
-					Трудности с обработкой таймаутов и fallback.
+					<p>Трудности с обработкой таймаутов и fallback.
 				</section>
 
 				<section>
@@ -106,7 +119,7 @@ while (true) { // упрощенный вариант сервера
 				</section>
 
 				<section>
-					Такая архитектура показала свою эффективность.
+					<p>Такая архитектура показала свою эффективность.
 
 					<p>Например:
 
@@ -144,7 +157,7 @@ while (true) { // упрощенный вариант сервера
 					<p>Блочный I/O оптимальнее потокового, он избегает лишних копирований
 					и преобразований данных.
 
-					<p>Нам NIO интересен тем, что только в нем есть неблокирующий ввод-вывод.
+					<p class="fragment">Нам NIO интересен тем, что только в нем есть неблокирующий ввод-вывод.
 				</section>
 
 				<section>
@@ -153,17 +166,18 @@ while (true) { // упрощенный вариант сервера
 					Специальный режим сокета.
 <pre><code class="scala">
 socketChannel.configureBlocking(false)
+
 </code></pre>
 				</section>
 				<section>
-					<p>Блокирущий read: читает сколько может; если данных нет - ждет 
+					<p>Блокирущий read: читает сколько может;<br> если данных нет - ждет 
 
-					<p>Неблокирующий read: мгновенно читает сколько может; нет данных - пустой результат
+					<p class="fragment">Неблокирующий read: мгновенно читает сколько может; нет данных - пустой результат
 				</section>
 
 				<section>
 					<p>Блокирующий write: пишет всё что передали; если клиент не успевает - ждет и продолжает
-					<p>Неблокирующий write: мгновенно пишет сколько может; если клиент не готов - ничего не пишет
+					<p class="fragment">Неблокирующий write: мгновенно пишет сколько может; если клиент не готов - ничего не пишет
 				</section>
 
 				<section>
@@ -204,12 +218,17 @@ while (buffer.hasRemaining) {
 				</section>
 
 				<section>
+					<p>Вернулись к блокировкам?
+				</section>
+
+				<section>
 					<h3>Event Loop - используем один Selector на всех клиентов</h3>
 				</section>
 
 				<section>
 <pre><code class="scala">val selector: Selector = Selector.open()
 
+// можно зарегистрировать много сокетов
 serverSocket.register(selector, SelectionKey.OP_ACCEPT, 
   () -&gt; println("Got new connection"))
 
@@ -226,7 +245,7 @@ while (true) {
 				</section>
 
 				<section>
-					Итого:
+					<p>Итого:
 					<ul>
 						<li>"Реактивная логика", основанная на событиях
 						<li>Неограниченное количество клиентов на один поток
@@ -234,28 +253,45 @@ while (true) {
 				</section>
 
 				<section>
+					<p>Сложности?
+
+					<p class="fragment">Запутанная логика чтения - нарезка потока от клиента
+					на произвольные блоки.
+
+					<p class="fragment">Запись только по готовности клиента
+				</section>
+
+				<section>
+					<p>Обычно не проблема - программист работает или с готовым сервером,
+					или с framework (netty, akka-io и т.п.)
+				</section>
+
+				<section>
 					Такой подход не сочитается с:
 					<ul>
 						<li>Долгими вычислениями на CPU
-						<li>Блокирующимися вызовами
-						<li>Вызовами асинхронных API
+						<li class="fragment">Блокирующимися вызовами (например JDBC)
+						<li class="fragment">Вызовами асинхронных API
 					</ul>
 				</section>
 
 				<section>
 					<h3>Комбинируем потоки и Event Loop</h3>
+					<p>(пример реализации)
 				</section>
 
 				<section>
-					<p>Раньше наши обработчики работали прямо в нашем потоке.
+					<p>Раньше наши обработчики работали<br> прямо в нашем потоке.
 
 					<p>Сделаем их функциями <br> Unit ⇒ Future[Action]
+
+					<p><small>Action - кодирует следующую операцию над сокетом</small>
 				</section>
 
 				<section>
 					Вызов такой функции делается просто:
 <pre><code class="scala">selectionKeys.foreach { sk ⇒
-  sk.interestOps(0)
+  sk.interestOps(0) // не ждем новых событий
   sk.attachment().asInstanceOf[() ⇒ Future[Action]].apply()
 }
 </code></pre>
@@ -271,7 +307,8 @@ while (true) {
 
 				<section>
 					Создаем специальный Executor:
-<pre><code class="scala">val queue = new ConcurrentLinkedQueue[Runnable]
+<pre><code class="scala"> // неблокирующаяся очередь, построенная на CAS операциях
+val queue = new ConcurrentLinkedQueue[Runnable]
 val executor: Executor = task ⇒ queue.add(task)
 </code></pre>
 					очередь разбираем цикле обработки событий:
@@ -318,6 +355,13 @@ while ({ task = queue.poll(); task } != null) {
 					подход.
 				</section>
 
+				<section>
+					<p>Похожий event-loop используется в клиентах к веб-сервисам
+					и к некоторым СУБД.
+
+					<p class="fragment">Функция выполнения запроса возвращает Future,
+					которая обрабатывается в event loop клиента.
+				</section>
 
 				<section>
 					<h3>HTTP протокол</h3>
