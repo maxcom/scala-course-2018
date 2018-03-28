@@ -526,7 +526,7 @@ while ({ task = queue.poll(); task } != null) {
 				</section>
 
 				<section>
-					<h3>Play Framework
+					<h3>Play Framework</h3>
 				</section>
 
 				<section>
@@ -540,6 +540,18 @@ while ({ task = queue.poll(); task } != null) {
 
 					<p class="fragment">Быстрый асинхронный веб-сервер на базе
 					Netty или Akka-HTTP.
+				</section>
+
+				<section>
+					<p>плюс опциональные<br> компоненты:
+					<ul>
+						<li>html-шаблоны
+						<li>json и xml
+						<li>http клиент
+						<li>аутентификация
+						<li>работа с JDBC (SQL)
+						<li>и пр.
+					</ul>
 				</section>
 
 				<section>
@@ -579,16 +591,74 @@ PlayKeys.playMonitoredFiles ++=
 				</section>
 
 				<section>
-					<p>Создаем пустой конфиг src/main/resources/application.conf
+					<p>Создаем пустой конфиг<br> src/main/resources/application.conf
 				</section>
 
 				<section>
-					<p>Отключаем фильтры по-умолчанию в application.conf:
+					<p>Отключаем фильтр по имени хоста в application.conf:
 <pre><code class="scala">
 play.filters.disabled+=play.filters.hosts.AllowedHostsFilter
 </code></pre>
-					<p>В демо-проекте они нам не нужны, в реальной жизни
-					их нужно настроить
+					<p>В демо-проекте он нам не нужен,<br> в реальной жизни его
+					нужно настроить
+				</section>
+
+				<section>
+					<p>На этом этапе можно уже запустить веб-сервер:
+<pre><code class="scala">
+sbt run
+
+</code></pre>
+					<p>в терминале или через меню в IDEA
+				</section>
+
+				<section>
+					<p>Сервер запускается в режиме разработчика<br>
+					<a target="_blank" href="http://localhost:9000/">http://localhost:9000/</a>
+					<p>при изменениях сервер не нужно перезапускать:<br> изменения
+					автоматически подхватываются
+				</section>
+
+				<section>
+					<p>Hello, world!<br>
+					src/main/scala/controllers/HelloWorld.scala
+<pre><code class="scala">
+package controllers
+
+import javax.inject.Inject
+import play.api.mvc.{AbstractController, ControllerComponents}
+
+class HelloWorld @Inject()(cc: ControllerComponents) 
+    extends AbstractController(cc) {
+  def hello() = Action {
+    Ok("Hello, world!") // просто text/plain
+  }
+}
+</code></pre>
+					
+				</section>
+
+				<section>
+					<p>Action может быть асинхронным:
+<pre><code class="scala">
+class HelloWorld @Inject()(cc: ControllerComponents) 
+    extends AbstractController(cc) {
+  implicit val ec: ExecutionContext = defaultExecutionContext
+
+  def hello() = Action.async {
+    Future {
+      Ok("Hello, world!")
+    }
+  }
+}
+</code></pre>
+				</section>
+
+				<section>
+					<p>Таблица роутинга запросов:<br>
+					src/main/resources/routes
+<pre><code class="scala">GET         /             controllers.HelloWorld.hello
+</code></pre>
 				</section>
 
 				<section>
