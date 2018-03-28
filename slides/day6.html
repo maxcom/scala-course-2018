@@ -370,7 +370,25 @@ while ({ task = queue.poll(); task } != null) {
 				<section>
 					<p>Протокол передачи данных, придуманный для Web.
 
-					<p class="fragment">Кроме front-end, используется для взаимодействия
+					<p class="fragment">Придуман для "классических" сайтов:
+					<ul class="fragment">
+						<li>Генерация HTML на сервере
+						<li>Перезагрузка страниц при переходах
+						<li>Взаимодействие с сервером через формы
+					</ul>
+				</section>
+
+				<section>
+					<p>Позже эволюционировали в JavaScript-приложения
+					<ul>
+						<li>HTML только для первоначальной загрузки
+						<li>State в памяти, взаимодействие с клиентом без перезагрузки
+						<li>Взаимодействие с сервером через AJAX - запросы с XML и JSON телом
+					</ul>
+				</section>
+
+				<section>
+					<p>Кроме веб часто используется для взаимодействия
 					сервисов между собой.
 				</section>
 
@@ -454,6 +472,7 @@ GET /scala-course/slides/day6.html HTTP/1.1
 
 				<section>
 					<pre><code class="http">
+Host: localhost:9000
 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
 Accept-Encoding: gzip, deflate, br
 Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
@@ -477,7 +496,7 @@ User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (
 				</section>
 
 				<section>
-					<p>Два режима передачи тела: известной длины и неизвестной (chunked).
+					<p>Два режима передачи тела запроса:<br> известной длины и неизвестной (chunked).
 				</section>
 
 				<section>
@@ -485,7 +504,7 @@ User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (
 					<pre><code class="scala">
 HTTP/1.1 200 OK
 					</code></pre>
-					<p>Версия протокола и статус ответа
+					<p>версия протокола и статус ответа
 				</section>
 
 				<section>
@@ -500,7 +519,7 @@ HTTP/1.1 200 OK
 					</ul>
 
 					<p><small>Хороший справочник по кодам - в английской
-					<a target="_blank" href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes">википедии</a></small>.
+					<a target="_blank" href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes">википедии</a>.</small>
 				</section>
 
 				<section>
@@ -544,6 +563,15 @@ Set-Cookie: JSESSIONID=1485581EB69CB469B9E766D8DCEF4652; Path=/; Secure; HttpOnl
 
 				<section>
 					<h3>REST API</h3>
+				</section>
+
+				<section>
+					<p>Как строить API поверх HTTP?
+
+					<p class="fragment">Можно инкапсулировать протокол поверх HTTP.
+
+					<p class="fragment">Но это сложно и не позволяет использовать
+					полезные свойства протокола.
 				</section>
 
 				<section>
