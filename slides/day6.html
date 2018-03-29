@@ -534,8 +534,8 @@ DELETE /users/:login  controllers.Users.dropAdmin(login)
 
 <h1>Классификатор</h1>
 
-<form action="/classify" method="POST">
-    <textarea>@text</textarea>
+<form action="/classify" method="GET">
+    <textarea name="text">@text</textarea>
     <button type="submit">Классифицировать</button>
 </form>
 
@@ -553,6 +553,13 @@ def showForm() = Action {
   Ok(views.html.form(None, None, None))
 }
 					</code></pre>
+				</section>
+
+				<section>
+					<p>Данные формы при методе GET передаются параметрами в URL
+
+					<p>В функцию обработки запроса нужно добавить параметр,
+					Play передаст туда значение из URL.
 				</section>
 
 				<section>
@@ -581,7 +588,16 @@ def showForm() = Action {
 				</section>
 
 				<section>
+					<p>Напоминаю:
+					<ul>
+						<li>Страничка курса: <a href="https://maxcom.github.io/scala-course/">https://maxcom.github.io/scala-course/</a>
+						<li>Посещения - отмечаем на листочке
+					</ul>
+				</section>
+
+				<section>
 					<h3>Архитектура обработки запросов</h3>
+					<p>Дополнительные материал, если успеем</p>
 				</section>
 
 				<section>
@@ -898,7 +914,13 @@ while ({ task = queue.poll(); task } != null) {
 					которая обрабатывается в event loop клиента.
 				</section>
 
-
+				<section>
+					<p>Напоминаю:
+					<ul>
+						<li>Страничка курса: <a href="https://maxcom.github.io/scala-course/">https://maxcom.github.io/scala-course/</a>
+						<li>Посещения - отмечаем на листочке
+					</ul>
+				</section>
 			</div>
 
 		</div>
