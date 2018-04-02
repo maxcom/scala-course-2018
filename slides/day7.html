@@ -37,18 +37,84 @@
 				<section>
 					<h2>План</h2>
                                         <ol>
-                                          <li>Актор — асинхронный объект.</li>
-					  <li>Диспетчеры.</li>
-					  <li>Обработка исключительных ситуаций.</li>
-					  <li>Большой рассказ о гарантиях.</li>
-					  <li>CircuitBreaker.</li>
-					  <li>Регулировка скорости обработки.</li>
-					  <li>Вопросы.</li>
+						<li>Статус по практическому заданию
+						<li>Практическое задание: http client и API vk.com
+        	                                <li>Актор — асинхронный объект.</li>
+						<li>Диспетчеры.</li>
+					 	<li>Обработка исключительных ситуаций.</li>
+					  	<li>Большой рассказ о гарантиях.</li>
+					  	<li>CircuitBreaker.</li>
+					  	<li>Регулировка скорости обработки.</li>
 					</ol>
 				</section>
 
 				<section>
-					<h2>1. Актор — асинхронный объект.</h2>
+					<p>План задания
+					<ol>
+						<li>Классификатор текстов
+						<li>Reads для vk.com (только reads! writes не нужно)
+						<li>Стемминг и диагностика
+						<li>Сервис категоризации<br>-------- мы находимся здесь -------
+						<li>Оценка сообщений соц. сетей - API vk.com
+						<li>Опрос новых записей и хранение состояния на диске
+					</ol>
+				</section>
+
+				<section>
+					<h3>HTTP клиент в Play Framework</h3>
+				</section>
+
+				<section>
+					<p>Подключаем HTTP Client и dependency injection
+
+					<p>TODO
+				</section>
+
+				<section>
+					<p>Делаем HTTP-запросы
+
+					<p>TODO
+				</section>
+
+				<section>
+					<h3>Обращаемся к API vk.com</h3>
+				</section>
+
+				<section>
+					<p>Нет логина на vk.com?<br>что-нибудь придумаем
+				</section>
+
+				<section>
+					<p>Предварительные шаги:
+					<ul>
+						<li>Создаем новое приложение на vk.com
+						<li>Включаем приложение
+						<li>Запрашиваем access_token с нужными правами
+					</ul>
+				</section>
+
+				<section>
+					<p>работа с vk.com: TODO
+				</section>
+
+				<section>
+					<p>/newsfeed - сервис оценки newsfeed
+
+					<ul>
+						<li>Загружаем ленту новостей
+						<li>Для каждого уникального пользователя запрашиваем его свойства
+						<li>Классифицируем все тексты
+						<li>Отображаем ленту новостей: класс текста, текст с разметкой
+						<li>Показываем имя пользователя и его фото, число likes текста
+					</ul>
+				</section>
+
+				<section>
+					<h2>Akka и акторы</h2>
+				</section>
+
+				<section>
+					<h3>Актор — асинхронный объект.</h3>
 					<table>
 						<thead>
 							<tr>
@@ -343,7 +409,11 @@ context.watch(anotherActorRef)
 				</section>
 
 				<section>
-					<h1>Вопросы</h1>
+					<p>Напоминаю:
+					<ul>
+						<li>Страничка курса: <a href="https://maxcom.github.io/scala-course/">https://maxcom.github.io/scala-course/</a>
+						<li>Посещения - отмечаем на листочке
+					</ul>
 				</section>
 
 			</div>
