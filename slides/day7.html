@@ -130,7 +130,22 @@
 				</section>
 
 				<section>
-					<h3>Актор — асинхронный объект.</h3>
+					<p>Дальше будем говорить про реализацию модели
+					в библиотеке <a target="_blank" href="https://akka.io/">Akka</a>.
+				</section>
+
+				<section>
+					<p>Актор — асинхронный объект</p>
+
+					<ul>
+						<li class="fragment">Приватное изменяемое состояние
+						<li class="fragment">Mailbox - входящая очередь сообщений
+						<li class="fragment">"Поведение" (behavior) - логика обработки
+						<li class="fragment">и др. (об этом позже)
+					</ul>
+				</section>
+
+				<section>
 					<table>
 						<thead>
 							<tr>
@@ -140,24 +155,41 @@
 							<tr class="fragment">
 								<td>Вызов</td>
 								<td>counter.incr(n)</td>
-								<td>counter ! Incr(n)</td>
+								<td>counter ! Incr(n)<br>
+								counter.tell(Incr(n))</td>
+
 							</tr>
 							<tr class="fragment">
 								<td>Запрос</td>
 								<td>counter.get()<br>⇒ Int</td>
-								<td>counter ? Get<br>⇒ Future[Int]</td>
+								<td>counter ? Get<br>
+								counter.ask(Get)<br>⇒ Future[Int]</td>
 							</tr>
-							<tr class="fragment">
-								<td>Параллельность</td>
-								<td>есть</td>
-								<td>нет</td>
-							</tr>
-							<tr class="fragment">
-								<td>Изменяемые аргументы</td>
-								<td>возможны</td>
-								<td>невозможны</td>
 						</thead>
 					</table>
+				</section>
+
+				<section>
+					<p>В ООП логика моделируется взаимодействием объектов.
+
+					<p class="fragment">В модели акторов - взаимодействием акторов
+				</section>
+
+				<section>
+					<p>В ООП методы можно вызывать из разных потоков.
+
+					<p class="fragment">Потокобезопасность?
+
+					<ul>
+						<li class="fragment">реализована при помощи блокировок, atomic и т.п.
+						<li class="fragment">отсутствует, т.е. перекладывается на пользователя
+					</ul>
+				</section>
+
+				<section>
+					<p>У актора обработка сообщений строго последовательна.
+
+					<p class="fragment">Акторы работают независимо в разных потоках.
 				</section>
 
 				<section>
