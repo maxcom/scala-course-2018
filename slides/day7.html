@@ -140,7 +140,7 @@
 					<ul>
 						<li class="fragment">Приватное изменяемое состояние
 						<li class="fragment">Mailbox - входящая очередь сообщений
-						<li class="fragment">"Поведение" (behavior) - логика обработки
+						<li class="fragment">Логика обработки сообщений (behavior) 
 						<li class="fragment">и др. (об этом позже)
 					</ul>
 				</section>
@@ -193,9 +193,7 @@
 				</section>
 
 				<section>
-					<pre>
-<code>
-class CounterActor extends Actor {
+					<pre><code class="scala">class CounterActor extends Actor {
   import CounterActor._
 
   private var value: Long = 0 // state
@@ -209,15 +207,10 @@ class CounterActor extends Actor {
 object CounterActor {        // protocol
   case class Incr(n: Long)
   case object Get
-}
-
-						</code>
-					</pre>
+} </code></pre>
 				</section>
 				<section>
-
-					<pre>
-<code>
+					<pre><code class="scala">
 object Main extends App {
   val system = ActorSystem("DemoSystem")
   val counterActor: ActorRef = 
@@ -226,17 +219,18 @@ object Main extends App {
   counterActor ! Incr(1)
   println(Await.result(counterActor ? Get, 1.minutes))
 }
-						</code>
-					</pre>
+					</code></pre>
+
+					<p>ActorRef — идентификатор актора. 
 				</section>
 
 				<section>
-					<p>Приватное состояние без синхронизации.
-					Сериализация
-					операций над внешним миром, например актор для:</p>
+					<p>Приватное состояние - не только переменные.
+
+					<p class="fragment">Актор может скрывать за собой внешние сущности:
 					<ul>
-						<li>чтения из RandomAccessFile (seek/read). 
-						<li>обработки данных пользователя, хранящихся во внешнем
+						<li class="fragment">чтения из RandomAccessFile (seek/read). 
+						<li class="fragment">обработки данных, хранящихся во внешнем
 						    хранилище.
 					</ul>
 				</section>
@@ -250,25 +244,67 @@ object Main extends App {
 				</section>
 
 				<section>
-					<h3>Актор состоит из:</h3>
+					<p>Что можно отправлять актору?
+
 					<ul>
-						<li>Состояния
-						<li>Логики обработки сообщений (behaviour)
-						<li>Очереди сообщений (mailbox)
+						<li class="fragment">Неизменяемые данные
+						<li class="fragment">Ссылки на акторы - ActorRef
 					</ul>
-					<p><strong>ActorRef</strong> — идентификатор актора. 
+				</section>
+
+				<section>
+					<p>Можно ли посылать функции?
+
+					<ul>
+						<li class="fragment">Можно, потому что в функции тоже неизменяемые
+						<li class="fragment">Нельзя, если в замыкании мутабельные структуры.
+						И еще это сомнительно с точки зрения модели.
+					</ul>
+				</section>
+
+				<section>
+					<p>Можно ли посылать внешние объекты, вроде коннектов к БД, сокетов, т.п.?
+
+					<ul>
+						<li class="fragment">Нельзя, это нарушение модели
+						<li class="fragment">Можно, когда понимаем что делаем и зачем.<br>
+						<span class="fragment">Так делают на "границе" между акторами и внешним миром.</span>
+					</ul>
 				</section>
 
 				<section>
 					<h3>Location transparency</h3>
-					<ul>
-						<li>Классический RPC — удаленные вызовы подобны локальным
-						<li>Акторы — локальные «вызовы» подобны удаленным
-					</ul>
-					<p>На заметку: мы не используем remote actors; но принципиально
-					   это ничего не меняет</p>
+
+					<p>Акторы могут быть расположены в разных виртуальных машинах и на разных серверах.
 				</section>
 
+				<section>
+					<p>Взаимодействие акторов по сети не похоже на RPC (Remote Procedure Call).
+				</section>
+
+				<section>
+					<ul>
+						<li>Классический RPC — удаленные вызовы подобны локальным
+						<li class="fragment">Акторы — локальные «вызовы» подобны удаленным
+					</ul>
+				</section>
+
+				<section>
+					<p>Асинхронная логика больше похожа на взаимодействие по сети, чем
+					на цепочку вызовов в одном потоке.
+				</section>
+
+				<section>
+					<h3>ask внутри акторов и асинхронные вызовы</h3>
+
+					<p>TODO
+				</section>
+
+				<section>
+					<h3>Смена behavior на примере машины состояний и stash</h3>
+
+					<p>TODO
+				</section>
 
 				<section>
 					<h2>Диспетчеры</h2>
@@ -342,6 +378,10 @@ override val supervisorStrategy =
 				</section>
 
 				<section>
+					<p>TODO: пример Exponential back off
+				</section>
+
+				<section>
 					<h3>Death pact &amp; death watch</h3>
 					<p>Пример: один запрос – три иерархии.
 					<img src="service.svg">
@@ -369,40 +409,72 @@ context.watch(anotherActorRef)
 				</section>
 
 				<section>
-					<h2>Сказка о транзакциях</h2>
+					<p>Потеря сообщений - проблема "модели"?
+				</section>
+
+				<section>
+					<p>Пример: наша кофейня<br> использует идеальную БД
 					<ul>
-						<li>Транзакции спасут не только данные, но и нас
-						<li>Двухфазный коммит спасёт вообще всех
+						<li>A - Atomicity
+						<li>C - Consistency
+						<li>I - Isolation
+						<li>D - Durability
 					</ul>
 				</section>
 
 				<section>
-					<p>Протокол двухфазного коммита кофемашины и СУБД</p>
-					<p class="fragment">Что значит ошибка сети или таймаут?</p>
+					<p>Счет каждого посетителя хранится в табличке
+
+					<p class="fragment">Списания - через UPDATE
+				</section>
+
+				<section>
+					<p>Согласована ли связка ПО + БД?
+				</section>
+
+				<section>
+					<p>Что значит ошибка сети или таймаут?</p>
 					<ul>
-						<li class="fragment">Транзакция не прошла
+						<li class="fragment">Не получилось начать транзакцию
 						<li class="fragment">Транзакция прошла, но не прошло подтверждение
 						<li class="fragment">Процесс еще не окончен
+						<li class="fragment">+ ошибки и сбои (которых нет в идеальной БД)
 					</ul>
+				</section>
+
+				<section>
+					<p>Таймаут? Таймаут есть всегда
+				</section>
+
+				<section>
+					<p>В асинхронной системе похожие проблемы:
+					<ul>
+						<li class="fragment">Переполненные очереди
+						<li class="fragment">Медленые обработчики
+						<li class="fragment">Плохо обработанные сбои и ошибки
+					</ul>
+				</section>
+
+				<section>
+					<p>Эти проблемы - проблемы как с акторами, так и без.
 				</section>
 
 				<section>
 					<p>Решение проблемы</p>
 					<ul>
-						<li>Сбои допустимы
+						<li>Всегда помним о таймаутах
+						<li class="fragment">Сбои допустимы
 						<li class="fragment">Журналы у всех участников операции, процедуры сверки операций и другие
 							механизмы компенсации сбоев
 						<li class="fragment">Система не консистентна пока идут операции; каждая операция
 							консистентна только в конечном счете
-						<li class="fragment">Блокировок нет
 					</ul>
 				</section>
 
 				<section>
 					<h2>Вернемся к Akka</h2>
-					<p>Сбой нельзя детектировать.<p>
+					<p>Сбой нельзя детектировать (в общем случае).<p>
 					<p>Сбой и таймаут не отличимы.</p>
-					<p>Акторы действуют независимо, транзакций и блокировок нет</p>
 				</section>
 
 				<section>
@@ -412,9 +484,9 @@ context.watch(anotherActorRef)
 				</section>
 
 				<section>
-					<h2>Что обычно можно гарантировать</h2>
-					<p>Положительный ответ только после записи в хранилище или выполнения действия</p>
-					<p>Откладывание выполнения с гарантиями - передача "эстафетной палочки"
+					<h3>Что обычно можно гарантировать</h3>
+					<p class="fragment">Положительный ответ только после записи в хранилище или выполнения действия</p>
+					<p class="fragment">Откладывание выполнения с гарантиями - передача "эстафетной палочки"
 				</section>
 
 				<section>
@@ -445,6 +517,10 @@ context.watch(anotherActorRef)
 				</section>
 
 				<section>
+					<p>TODO: пример
+				</section>
+
+				<section>
 					<h2>Регулировка скорости обработки</h2>
 					<p>Проблема: быстрый producer + медленный consumer = Out Of Memory</p>
 					<p class="fragment">Решение: выбрасываем то, что не успеваем обработать</p>
@@ -454,6 +530,11 @@ context.watch(anotherActorRef)
 				<section>
 					<h3>Back pressure</h3>
 					<p>Раньше делали сами; теперь всегда используем akka-streams.</p>
+				</section>
+
+				<section>
+					<h3>Typed Akka</h3>
+					<p>TODO
 				</section>
 
 				<section>
