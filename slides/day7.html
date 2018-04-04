@@ -201,6 +201,9 @@ libraryDependencies +=
 					<p>У актора обработка сообщений строго последовательна.
 
 					<p class="fragment">Акторы работают независимо в разных потоках.
+
+					<p class="fragment">Общение двух акторов последовательно (очередь не
+					перемешивается).
 				</section>
 
 				<section>
@@ -626,18 +629,15 @@ class CounterActor extends Actor with Timers {
 					<pre>
 <code>
 override val supervisorStrategy =
-  OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1 minute) {
+  OneForOneStrategy(maxNrOfRetries = 10, 
+   withinTimeRange = 1 minute) {
     case _: ConnectionResetException        ⇒ Restart
     case _: DatabaseWasDeletedException     ⇒ Stop
     case _: SharedMemoryCorruptionException ⇒ Escalate
   }
 						</code>
 					</pre>
-					<p>Кроме быстрого перезапуска есть еще exponential back off</p>
-				</section>
-
-				<section>
-					<p>TODO: пример Exponential back off
+					<p class="fragment">Кроме быстрого перезапуска есть еще exponential back off</p>
 				</section>
 
 				<section>
@@ -648,7 +648,7 @@ override val supervisorStrategy =
 
 				<section>
 					<p>Ожидание остановки актора:</p>
-<pre>	<code>
+					<pre><code class="scala">
 context.watch(anotherActorRef)
 	</code></pre>
 					<p>Либо ловим сообщение Terminated(actorRef), либо «death pact» — останавливаемся вместе.</p>
@@ -723,15 +723,21 @@ context.watch(anotherActorRef)
 					<ul>
 						<li>Всегда помним о таймаутах
 						<li class="fragment">Сбои допустимы
-						<li class="fragment">Журналы у всех участников операции, процедуры сверки операций и другие
-							механизмы компенсации сбоев
-						<li class="fragment">Система не консистентна пока идут операции; каждая операция
-							консистентна только в конечном счете
+						<li class="fragment">Механизмы компенсации сбоев обязательны (например журналы у всех участников операции и процедуры сверки)
 					</ul>
 				</section>
 
 				<section>
-					<h2>Вернемся к Akka</h2>
+					<p>За одно отметим:
+					<ul>
+						<li>Блокировки охватывающие несколько подсистем не возможны
+						<li class="fragment">Глобальной консистентности нет пока идут операции
+						<li class="fragment">Каждая операция консистентна только в конечном счете
+					</ul>
+				</section>
+
+				<section>
+					<h3>Вернемся к Akka</h3>
 					<p>Сбой нельзя детектировать (в общем случае).<p>
 					<p>Сбой и таймаут не отличимы.</p>
 				</section>
@@ -759,8 +765,8 @@ context.watch(anotherActorRef)
 
 				<section>
 					<h3>«Happy path &amp; self heal»</h3>
-					<p>Пример в indexer-ng.</p>
-					<p class="fragment">«Happy path» — игнорируем сбои при первичной обработке события.</p>
+					<p>Пример в сервисе индексации сообщений</p>
+					<p class="fragment">«Happy path» — новые сообщений индексируем сразу; игнорируем сбои</p>
 					<p class="fragment">«Self heal» – периодически проводим сверку и запускаем в обработку то, что
 					не смогли обработать ранее.</p>
 				</section>
@@ -776,7 +782,21 @@ context.watch(anotherActorRef)
 				</section>
 
 				<section>
-					<p>TODO: пример
+					<p>Пример:
+					<pre><code class="scala">
+  private val breaker = new CircuitBreaker(
+    scheduler = scheduler, // context.system.scheduler
+    maxFailures = 5,
+    callTimeout = 10.seconds,
+    resetTimeout = 1.minute
+  )
+
+  def process(task: Task): Future[Result] = {
+    breaker.withCircuitBreaker {
+      askAnotherService(task)
+    }
+  }
+	</code></pre>
 				</section>
 
 				<section>
@@ -788,12 +808,11 @@ context.watch(anotherActorRef)
 
 				<section>
 					<h3>Back pressure</h3>
-					<p>Раньше делали сами; теперь всегда используем akka-streams.</p>
-				</section>
+					<p>Раньше делали сами - считали подтверждения для 
+					оценки размера очереди.</p>
 
-				<section>
-					<h3>Typed Akka</h3>
-					<p>TODO
+					<p class="fragment">Сейчас используем Akka Streams:<br>
+					поговорим об этом на 8-м занятии.
 				</section>
 
 				<section>
@@ -803,6 +822,56 @@ context.watch(anotherActorRef)
 						<li>Посещения - отмечаем на листочке
 					</ul>
 				</section>
+
+				<section>
+					<h3>Роутеры</h3>
+					<p>Дополнительный материал</p>
+				</section>
+
+				<section>
+					<p>Раздаем задачи пулу акторов:
+
+					<ul>
+						<li>RoundRobinRouting
+						<li>SmallestMailboxRouting
+						<li>RandomRouting
+					</ul>
+				</section>
+
+				<section>
+					<p>ConsistentHashingRouting - роутинг по ключу на основе сообщения
+
+					<ul>
+						<li class="fragment">сохраняет порядок для сообщений с одним ключем
+						<li class="fragment">сохраняет обработчика для сообщений с одним ключем
+					</ul>
+				</section>
+
+				<section>
+					<p>ScatterGatherFirstCompletedRouting
+
+					<p>Отправляем всем, используем первый ответ.
+
+					<p class="fragment">Улучшаем время отклика, но выполняем работу N раз
+				</section>
+
+				<section>
+					<p>TailChoppingRouting
+
+					<p>Отправляем первому, через короткий таймаут второму и продолжаем пока не
+					получим первый ответ.
+
+					<p class="fragment">Улучшаем худшие времена отклика.
+				</section>
+
+				<section>
+					<p>Напоминаю:
+					<ul>
+						<li>Страничка курса: <a href="https://maxcom.github.io/scala-course/">https://maxcom.github.io/scala-course/</a>
+						<li>Посещения - отмечаем на листочке
+					</ul>
+				</section>
+
 
 			</div>
 
