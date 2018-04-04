@@ -525,6 +525,37 @@ private def ready: Receive = {
 
 				<section>
 					<h3>Таймеры и Deadline</h3>
+				</section>
+
+				<section>
+					<p>Deadline - точка во времени
+
+					<pre><code class="scala">
+import scala.concurrent.duration._
+
+val deadline: Deadline = 5 minutes fromNow
+					</code></pre>
+				</section>
+
+				<section>
+					<ul>
+						<li>Использует монотонные часы
+						<li class="fragment">Используется в акторах для прерывания обработки запроса
+					</ul>
+				</section>
+
+				<section>
+					<pre><code class="scala">
+deadline.hasTimeLeft() // проверки
+deadline.isOverdue()
+
+// величина таймаута
+val timeout: Duration = deadline.timeLeft
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Таймеры и receive timeout
 
 					<p>TODO
 				</section>
