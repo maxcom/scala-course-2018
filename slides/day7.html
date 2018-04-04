@@ -503,8 +503,7 @@ private def ready: Receive = {
     context.become(waiting)
   case Process(task) ⇒
     ???
-}
-					</code></pre>
+} </code></pre>
 				</section>
 
 				<section>
@@ -555,9 +554,44 @@ val timeout: Duration = deadline.timeLeft
 				</section>
 
 				<section>
-					<p>Таймеры и receive timeout
+					<p>Таймеры
+					<pre><code class="scala">
+class CounterActor extends Actor with Timers {
+  import CounterActor._
 
-					<p>TODO
+  // key для уникальности таймера
+  // msg - отправляемое сообщение
+  timers.startSingleTimer(key = Tick, msg = Tick, 1 minute)
+
+  timers.startPeriodicTimer(key = Tick, msg = Tick, 1 minute)
+  
+  timers.cancel(Tick)
+
+  timers.cancelAll()
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Зачем?
+
+					<ul>
+						<li>Обработка таймаутов
+						<li>Периодическое обновление, очистка
+						<li>Печать статистики работы
+					</ul>
+				</section>
+
+				<section>
+					<p>Receive Timeout - реакция на отсутствие сообщений
+
+					<p class="fragment">Защитный механизм для коротокоживущих акторов
+
+					<pre class="fragment"><code class="scala">context.setReceiveTimeout(5 minutes)
+
+// отправляет ReceiveTimeout при отсутствии активности
+					</code></pre>
+
+					<p class="fragment"><small>Игнорирует сообщения расширяющие NotInfluenceReceiveTimeout</small>
 				</section>
 
 				<section>
