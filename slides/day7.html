@@ -65,15 +65,33 @@
 				</section>
 
 				<section>
-					<p>Подключаем HTTP Client и dependency injection
+					<p>Подключаем HTTP Client: build.sbt
+					<pre><code class="scala">
+libraryDependencies += ws
+					</code></pre>
+				</section>
 
-					<p>TODO
+				<section>
+					<p>В контроллере:
+					<pre><code class="scala">
+import play.api.libs.ws.WSClient // не путаем с Java API!
+
+class DemoController @Inject()(cc: ControllerComponents, 
+  wsClient: WSClient)
+					</code></pre>
 				</section>
 
 				<section>
 					<p>Делаем HTTP-запросы
+					<pre><code class="scala">
+wsClient
+  .url(url) // куда обращаемся
+  .get // выполняем метод, получаем Future
+  .map(_.body[JsValue]) // читаем JSON
+  .foreach(v ⇒ println(Json.prettyPrint(v)))
+					</code></pre>
 
-					<p>TODO
+					<p>Подробнее в <a target="_blank" href="https://www.playframework.com/documentation/2.6.x/ScalaWS">документации</a>.
 				</section>
 
 				<section>
@@ -94,19 +112,44 @@
 				</section>
 
 				<section>
-					<p>работа с vk.com: TODO
+					<p>Смотрим документацию:<br>
+					<a target="_blank" href="https://vk.com/dev/first_guide">Знакомство с API ВКонтакте</a>
+				</section>
+
+				<section>
+					<p>Какие нужны права:
+					<ul>
+						<li>wall,friends - доступ к ленте новостей
+						<li>offline - без ограничений по времени
+					</ul>
+				</section>
+
+				<section>
+					<p>Пример URL:
+
+					<pre><code class="html">
+https://oauth.vk.com/authorize?client_id=NNNNN&amp;display=page&amp;redirect_uri=https://oauth.vk.com/blank.html&amp;scope=wall,friends,offline&amp;response_type=token&amp;v=5.52
+					</code></pre>
+				</section>
+
+				<section>
+					<p>не дает token - перелогиньтесь
 				</section>
 
 				<section>
 					<p>/newsfeed - сервис оценки newsfeed
 
 					<ul>
-						<li>Загружаем ленту новостей
+						<li>Загружаем ленту новостей (используем написаные ранее Reads)
 						<li>Для каждого уникального пользователя запрашиваем его свойства
 						<li>Классифицируем все тексты
 						<li>Отображаем ленту новостей: класс текста, текст с разметкой
 						<li>Показываем имя пользователя и его фото, число likes текста
 					</ul>
+				</section>
+
+				<section>
+					<p>access_token не выкладывайте в gitlab!
 				</section>
 
 				<section>
