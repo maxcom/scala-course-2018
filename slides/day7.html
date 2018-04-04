@@ -226,7 +226,8 @@ libraryDependencies +=
 				<section>
 					<p>В ООП логика моделируется взаимодействием объектов.
 
-					<p class="fragment">В модели акторов - взаимодействием акторов
+					<p class="fragment">В модели акторов - взаимодействием акторов путем 
+					обмена сообщениями.
 				</section>
 
 				<section>
@@ -245,7 +246,7 @@ libraryDependencies +=
 
 					<p class="fragment">Акторы работают независимо в разных потоках.
 
-					<p class="fragment">Общение двух акторов последовательно (очередь не
+					<p class="fragment">Общение двух акторов последовательно<br> (очередь не
 					перемешивается).
 				</section>
 
@@ -257,8 +258,7 @@ libraryDependencies +=
 
   override def receive = {            // behavior
     case Incr(n) ⇒ value += n
-    case Get     ⇒ sender() ! value
-                   // при ошибке отправляем Status.Failure(ex)
+    case Get     ⇒ sender() ! value // или Status.Failure(ex)
   }
 }
 
@@ -279,7 +279,13 @@ object Main extends App {
 }
 					</code></pre>
 
-					<p>ActorRef — идентификатор актора. 
+					<p>ActorRef — идентификатор актора.
+				</section>
+
+				<section>
+					<p>В Akka Typed идентификатор актора ActorRef[Protocol]
+
+					<p>(этот API пока еще experimental)
 				</section>
 
 				<section>
@@ -287,9 +293,9 @@ object Main extends App {
 
 					<p class="fragment">Актор может скрывать за собой внешние сущности:
 					<ul>
-						<li class="fragment">чтения из RandomAccessFile (seek/read). 
-						<li class="fragment">обработки данных, хранящихся во внешнем
-						    хранилище.
+						<li class="fragment">RandomAccessFile (seek/read). 
+						<li class="fragment">данные во внешнем хранилище.
+						<li class="fragment">и др.
 					</ul>
 				</section>
 
@@ -308,6 +314,8 @@ object Main extends App {
 						<li class="fragment">Неизменяемые данные
 						<li class="fragment">Ссылки на акторы - ActorRef
 					</ul>
+
+					<p class="fragment">Изменяемые объекты посылать нельзя!
 				</section>
 
 				<section>
@@ -315,8 +323,8 @@ object Main extends App {
 
 					<ul>
 						<li class="fragment">Можно, потому что в функции тоже неизменяемые
-						<li class="fragment">Нельзя, если в замыкании мутабельные структуры.
-						И еще это сомнительно с точки зрения модели.
+						<li class="fragment">Нельзя, если в замыкании мутабельные структуры.<br>
+						<span class="fragment">И еще это сомнительно с точки зрения модели.</span>
 					</ul>
 				</section>
 
@@ -360,7 +368,7 @@ object Main extends App {
 				</section>
 
 				<section>
-					<h2>Диспетчеры</h2>
+					<h3>Диспетчеры</h3>
 					<ul>
 						<li>Runtime для акторов</li>
 						<li>Работают поверх Executor'ов</li>
@@ -398,8 +406,6 @@ object Main extends App {
 				<section>
 					<p>Пример
 					<pre><code class="scala">class CacheActor(source: ⇒ Future[Int]) extends Actor {
-  import CacheActor._
-
   private var value: Long = 0
 
   override def receive = {  
@@ -464,6 +470,7 @@ case RefreshAndGet ⇒
     case Failure(ex) ⇒
   }
 					</code></pre>
+					<p><small>В Akka Typed нет sender(), его явно передают</small>
 				</section>
 
 				<section>
@@ -526,7 +533,7 @@ class CounterActor extends Actor {
 
 					<ul>
 						<li class="fragment">Более функциональный подход; безопаснее
-						<li class="fragment">Рекомендуется авторами Akka
+						<li class="fragment">Подход "по умолчанию" в Akka Typed
 						<li class="fragment">Однако мутабельная версия часто эффективнее
 					</ul>
 				</section>
@@ -641,7 +648,7 @@ class CounterActor extends Actor with Timers {
 				</section>
 
 				<section>
-					<h2>Обработка исключительных ситуаций</h2>
+					<h3>Обработка исключительных ситуаций</h3>
 					<p>Виды ошибок в автомате с газировкой:
 					<ul>
 						<li>«Не достаточно средств», «закончилась кола» — пользователю
@@ -698,7 +705,7 @@ context.watch(anotherActorRef)
 				</section>
 
 				<section>
-					<h2>Отсутствие гарантий доставки</h2>
+					<h3>Отсутствие гарантий доставки</h3>
 
 					<p>Сообщение теряется при:</p>
 					<ul>
@@ -798,7 +805,7 @@ context.watch(anotherActorRef)
 				</section>
 
 				<section>
-					<h2>Команды и события</h2>
+					<h3>Команды и события</h3>
 					<ul>
 						<li>Команда: сделай что-то. Выполняем её с гарантиями.
 						<li class="fragment">Событие: что-то произошло, реагируй на это. Можем пропустить,
@@ -815,7 +822,7 @@ context.watch(anotherActorRef)
 				</section>
 
 				<section>
-					<h2>Circuit Breaker</h2>
+					<h3>Circuit Breaker</h3>
 					<p>«Предохранитель», которые можно вставлять между подсистемами.</p>
 					<p class="fragment">«Разрывает цепь» при частых ошибках.</p>
 					<div class="fragment">
@@ -843,7 +850,7 @@ context.watch(anotherActorRef)
 				</section>
 
 				<section>
-					<h2>Регулировка скорости обработки</h2>
+					<h3>Регулировка скорости обработки</h3>
 					<p>Проблема: быстрый producer + медленный consumer = Out Of Memory</p>
 					<p class="fragment">Решение: выбрасываем то, что не успеваем обработать</p>
 					<p class="fragment">Решение: замедляем producer'а (back pressure)</p>
