@@ -135,6 +135,17 @@
 				</section>
 
 				<section>
+					<p>Подключаем в проект: build.sbt
+
+					<pre><code class="scala">
+libraryDependencies += 
+  "com.typesafe.akka" %% "akka-actor" % "2.5.11"
+					</code></pre>
+
+					<p><small>в Play! зависимость уже и так есть</small>
+				</section>
+
+				<section>
 					<p>Актор — асинхронный объект</p>
 
 					<ul>
@@ -198,9 +209,10 @@
 
   private var value: Long = 0 // state
 
-  def receive = {            // behaviour
+  override def receive = {            // behavior
     case Incr(n) ⇒ value += n
     case Get     ⇒ sender() ! value
+                   // при ошибке отправляем Status.Failure(ex)
   }
 }
 
@@ -267,7 +279,7 @@ object Main extends App {
 
 					<ul>
 						<li class="fragment">Нельзя, это нарушение модели
-						<li class="fragment">Можно, когда понимаем что делаем и зачем.<br>
+						<li class="fragment">Можно, когда понимаем, что делаем и зачем.<br>
 						<span class="fragment">Так делают на "границе" между акторами и внешним миром.</span>
 					</ul>
 				</section>
@@ -276,7 +288,7 @@ object Main extends App {
 					<p>Пример актора: классификатор с обучением
 
 					<p class="fragment">Один актор на классификацию и обучение - просто, не эффективно
-					<p class="fragment">Актор для обучения, get запрос для модели - нужна immutable модель
+					<p class="fragment">Актор для обучения, get запрос для модели - нужна immutable модель или функция копирования
 				</section>
 
 				<section>
@@ -299,30 +311,6 @@ object Main extends App {
 				<section>
 					<p>Асинхронная логика больше похожа на взаимодействие по сети, чем
 					на цепочку вызовов в одном потоке.
-				</section>
-
-				<section>
-					<h3>ask внутри акторов и асинхронные вызовы</h3>
-
-					<p>TODO
-				</section>
-
-				<section>
-					<h3>Смена behavior и "immutable" акторы
-
-					<p>TODO
-				</section>
-
-				<section>
-					<h3>Машины состояний и stash</h3>
-
-					<p>TODO
-				</section>
-
-				<section>
-					<h3>Таймеры и Deadline</h3>
-
-					<p>TODO
 				</section>
 
 				<section>
@@ -352,6 +340,193 @@ object Main extends App {
 						<li class="fragment">Своя JVM и свой сервер на каждую подсистему (Akka Remote / Cluster).
 					</ul>
 					<p class="fragment">Факт: «Титаник» утонул из-за плохого разделения на отсеки.</p>
+				</section>
+
+
+				<section>
+					<h3>Работа с Future в акторе</h3>
+
+					<p>асинхронные API или ask на другие акторы
+				</section>
+
+				<section>
+					<p>Пример
+					<pre><code class="scala">class CacheActor(source: ⇒ Future[Int]) extends Actor {
+  import CacheActor._
+
+  private var value: Long = 0
+
+  override def receive = {  
+    case Get  ⇒ 
+      sender() ! value
+    case RefreshAndGet ⇒
+      import context.dispatcher // нужен ExecutionContext
+
+      source.onComplete {
+        ??? // другой поток
+      }
+  }
+}
+					</code></pre>
+				</section>
+
+				<section>
+					<pre><code class="scala">
+override def receive = {  
+  case Get  ⇒
+    sender() ! value
+  case RefreshAndGet ⇒
+    source.onComplete {
+      case Success(v) ⇒ self ! Refresh(v)
+      case Failure(ex) ⇒ // handle failure  
+    }
+  case Refresh(v) ⇒
+    value = v
+  // нужно еще отправить результат 
+}
+					</code></pre>
+				</section>
+
+				<section>
+					<p>sender() ?
+					<pre><code class="scala">
+case RefreshAndGet ⇒
+  source.onComplete {
+    case Success(v) ⇒ 
+      self ! Refresh(v)
+      sender() ! v // ошибка - тут sender() не определен
+    case Failure(ex) ⇒ 
+  }
+case Refresh(v) ⇒
+  value = v
+  sender() ! v // ошибка - тут sender() это мы
+
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Решение - сохраняем sender()
+
+					<pre><code class="scala">
+case RefreshAndGet ⇒
+  val replyTo = sender()
+  
+  source.onComplete {
+    case Success(v) ⇒
+      self ! Refresh(v)
+      replyTo ! v
+    case Failure(ex) ⇒
+  }
+					</code></pre>
+				</section>
+
+				<section>
+					<p>pipeTo: посылаем результат актору
+					<pre><code class="scala">
+import akka.pattern.pipe
+
+source pipeTo self
+					</code></pre>
+					<p>Успех - отправляет результат,<br> ошибка - Status.Failure(ex)
+				</section>
+
+				<section>
+					<h3>Смена behavior</h3>
+
+					<p>Актор может переключать реализации receive:
+
+					<pre><code class="scala">
+private def waiting: Receive = {
+  case GetReady ⇒
+    context.become(ready)
+}
+
+private def ready: Receive = {
+  case TakeRest ⇒
+    context.become(waiting)
+}
+
+override def receive = waiting
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Основные применения:
+					<ul>
+						<li>машины состояний
+						<li>"immutable" акторы
+					</ul>
+				</section>
+
+				<section>
+					<p>Пример: "immutable" counter	
+					<pre><code class="scala">
+class CounterActor extends Actor {
+  import CounterActor._
+  
+  private def counter(value: Long): Receive = {
+    case Get     ⇒ sender() ! value
+    case Incr(n) ⇒ context.become(counter(value + n))
+    
+  }
+
+  override def receive = counter(0)
+}
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Плюсы/минусы:
+
+					<ul>
+						<li class="fragment">Более функциональный подход; безопаснее
+						<li class="fragment">Рекомендуется авторами Akka
+						<li class="fragment">Однако мутабельная версия часто эффективнее
+					</ul>
+				</section>
+
+				<section>
+					<h3>Stash</h3>
+
+					<p>Можно временно отложить сообщения:
+					<pre><code class="scala"> // extends Actor with Stash
+private def waiting: Receive = {
+  case Process(task) ⇒
+    stash()
+  case GetReady ⇒
+    context.become(ready)
+    unstashAll()
+}
+
+private def ready: Receive = {
+  case TakeRest ⇒
+    context.become(waiting)
+  case Process(task) ⇒
+    ???
+}
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Пример: последовательная обработка и Future
+
+					<ul>
+						<li>Запрашиваем Future, переходим в waiting
+						<li class="fragment">В waiting кладем запросы в Stash
+						<li class="fragment">При вычислении Future - unstash и обратно в ready
+						<li class="fragment">Не забываем про ошибки, таймауты и пр.
+					</ul>
+				</section>
+
+				<section>
+					<p>Вместо Stash иногда эффективнее<br> накапливать запросы
+					в state
+				</section>
+
+				<section>
+					<h3>Таймеры и Deadline</h3>
+
+					<p>TODO
 				</section>
 
 				<section>
