@@ -15,8 +15,8 @@ layout: default
 * [Часть 5. Базовые примитивы многопоточности](slides/day5.html). 22 марта. [Видео](https://youtu.be/pbeuOGMJqds). [Версия для печати](slides/day5.html?print-pdf).
 
 * [Часть 6. HTTP Протокол. Play Framework. Архитектура высоконагруженных приложений.](slides/day6.html) Практическое задание: пишем сервис. 29 марта. [Видео](https://youtu.be/2ZQywwq_FKU). [Версия для печати](slides/day6.html?print-pdf).
-* [Часть 7. Акторы Akka.](slides/day7.html) Практическое задание: REST-клиент и отслеживание новых записей. 5 апреля. [Видео](https://youtu.be/j9VSFFo2LuI). [Версия для печати](slides/day7.html?print-pdf).
-* Часть 8. Akka Persistence и Akka Streams. Практическое задание: сохранение состояния и realtime обновление. 12 апреля.
+* [Часть 7. Акторы Akka.](slides/day7.html) Практическое задание: REST-клиент и vk.com. 5 апреля. [Видео](https://youtu.be/j9VSFFo2LuI). [Версия для печати](slides/day7.html?print-pdf).
+* [Часть 8. Akka Streams и реактивные потоки](slides/day8.html). Практическое задание: отслеживание новых записей. 12 апреля. [Версия для печати](slides/day8.html?print-pdf).
 * Часть 9. Подводим итоги и разбор кода практического задания. 19 апреля.
 
 Внимание! Для распечатки слайдов или сохранения в PDF используейте ссылки "версии для печати" и браузер Chrome/Chromium.
