@@ -29,8 +29,7 @@
 			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
 				<section>
-					<h1>Akka Streams и реактивные потоки</h1>
-					<p>Часть 8. Akka Streams и реактивные потоки.</p>
+					<h3>Часть 8. Akka Streams и реактивные потоки</h3>
 					<p><small>Страничка курса: <a href="https://maxcom.github.io/scala-course/">https://maxcom.github.io/scala-course/</small></a>
 				</section>
 
@@ -72,7 +71,115 @@
 
 				<section>
 					<h3>Зачем нужны асинхронные потоки?</h3>
-					<p>TODO
+					<div class="fragment">
+					<p>Например:
+					<ul>
+						<li class="fragment">Поточная отдача HTTP ответов
+						<li class="fragment">Поточная обработка данных
+					</ul>
+					</div>
+				</section>
+
+				<section>
+					<p>Обработчик HTTP запроса - функция
+					<pre><code class="scala">
+def controller(request: Request): Response
+					</code></pre>
+					либо
+					<pre><code class="scala">
+def controller(request: Request): Future[Response]
+					</code></pre>
+					<p>хорошо для простых задач с маленькими ответами
+				</section>
+
+				<section>
+					<p>Как отдать большую выборку, например из БД или другого сервиса?
+				</section>
+
+				<section>
+					<p>В классических сервлетах писали так:
+					<pre><code class="scala">
+override def service(rq: ServletRequest, 
+                     rs: ServletResponse): Unit = {
+  val input: ResultSet = ??? // запрашиваем данные у сервиса
+  try {
+    while (input.next()) {
+      val line = input.getString(DataColumn) // ждем БД
+      rs.getOutputStream.println(line) // ждем клиента
+    }
+  } finally {
+    input.close()
+  }
+}
+					</code></pre>
+					<p>(servlet 2.x)
+				</section>
+
+				<section>
+					<p>Отдача поточная, но:
+
+					<ul>
+						<li>занимаем поток под клиента
+						<li class="fragment">лишаем контейнер возможности оптимизировать ввод-вывод
+						<li class="fragment">чтение и обработка - только синхронные
+						<li class="fragment">один источник данных
+					</ul>
+				</section>
+
+				<section>
+					<p>Можно ли улучшить время отклика отдавая данные по мере готовности?
+				</section>
+
+				<section>
+					<p>Да, например классический веб:
+
+					<ul>
+						<li>Стили и шрифты в "шапке"
+						<li>"Ощущения" прогресса загрузки
+						<li>Рендеринг в процессе загрузки
+						<li>Подгрузка картинок и ресурсов в процессе
+					</ul>
+				</section>
+
+				<section>
+					<p>Более современный пример:<br>
+					<a target="_blank" href="https://www.ybrikman.com/writing/2015/06/30/ping-play-big-pipe-streaming-for-play-framework/">Ping-Play: Big Pipe Streaming for the Play Framework</a><br>
+					by Yevgeniy (Jim) Brikman
+				</section>
+
+				<section>
+					<p>картинка из статьи:
+					<img src="with-big-pipe.gif">
+				</section>
+
+				<section>
+					<p>Еще применения:
+
+					<ul>
+						<li>Отдача потоков событий
+						<li>Оптимизация в API между сервисами
+					</ul>
+				</section>
+
+				<section>
+					<p>Поточная обработка данных
+				</section>
+
+				<section>
+					<p>Сихронный режим не позволяет хорошо
+
+					<ul>
+						<li>Смешивать разные источники
+						<li class="fragment">Применять конвеер из асинхронных и параллельных обработчиков
+						<li class="fragment">Управлять скорость; группировать по времени
+						<li class="fragment">Передавать результат в несколько назначений
+					</ul>
+				</section>
+
+				<section>
+					<p>Можно ли собрать такой конвеер на акторах?
+
+					<p class="fragment">Можно, но нужен back pressure / flow control.
 				</section>
 
 				<section>
