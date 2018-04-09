@@ -162,6 +162,26 @@ override def service(rq: ServletRequest,
 				</section>
 
 				<section>
+					<p>Server Sent Events
+
+					<p>Передача потока событий с сервера в браузер.
+
+					<p><a taret="_blank" href="https://www.w3.org/TR/eventsource/">Стандарт</a> из семейства HTML5
+
+				</section>
+
+				<section>
+					<p>Клиент запрашивает URL,<br> в ответ - бесконечный поток событий
+					<pre><code class="scala">
+data: {"user":"Вася","message":"Вошел в систему"}
+
+data: {"user":"Вася","message":"Написал комментарий"}
+
+...
+					</code></pre>
+				</section>
+
+				<section>
 					<p>Поточная обработка данных
 				</section>
 
