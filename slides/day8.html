@@ -204,26 +204,175 @@ data: {"user":"Вася","message":"Написал комментарий"}
 
 				<section>
 					<h3>До streams: back pressure на акторах</h3>
-					<p>TODO
+
+					<p class="fragment">Пример: один producer / один consumer
 				</section>
 
 				<section>
-					<h3>Reactive Streams - стандартное API</h3>
-					<p>TODO
+					<pre><code class="scala">class Producer(consumer: ActorRef, 
+               source: Iterator[Int]) extends Actor {
+  private var current: Int = 1
+  private var lastAck: Int = 0
+
+  sendNext()
+
+  private def sendNext(): Unit = ???
+
+  override def receive: Receive = {
+    case Ack(n) ⇒
+      lastAck = n
+      sendNext()
+  } 
+}
+					</code></pre>
 				</section>
 
 				<section>
-					<h3>Akka Streams - основные понятия</h3>
-					<p>TODO
+					<pre><code class="scala">
+private def sendNext(): Unit = {
+  while (source.hasNext &amp;&amp; current - lastAck &lt; MaxProcessing) {
+    consumer ! Data(source.next(), current)
+    current+=1
+  }
+  
+  if (!source.hasNext) {
+    consumer ! Finished
+  }
+}
+					</code></pre>
 				</section>
 
 				<section>
-					<h3>Интеграция с акторами</h3>
+					<p>Минусы?
+					<ul>
+						<li>В реальном коде flow control сложнее
+						<li>Смеживание "бизнес-логики" и flow-control
+						<li>Дублирование логики в разных реализациях
+					</ul>
+				</section>
+
+				<section>
+					<h3>Akka Streams</h3>
+					<p>Библиотека для работы с асинхронными потоками, построенная на акторах Akka.
+				</section>
+
+				<section>
+					<p>Источник данных - пример числа от 1 до 100
+
+					<pre><code class="scala">
+val source: Source[Int, NotUsed] = Source(1 to 100)
+					</code></pre>
+
+					<p><small>NotUsed тут это "материализованное значение", об этом позже</small>
+				</section>
+
+				<section>
+					<p>Вот так можно обработать значения:
+					<pre><code class="scala">
+val result: Future[Done] = source.runForeach(i ⇒ println(i))
+					</code></pre>
+					<p>для запуска потребуется implicit Matelializer - интерпретатор потока
+				</section>
+
+				<section>
+					<p>Materializer строит логику выполнения из композиции элементов и акторов.
+
+					<pre><code class="scala">
+implicit val system: ActorSystem = ActorSystem("QuickStart")
+implicit val mat: Materializer = ActorMaterializer()
+					</code></pre>
+					<p><small>обычно создается один Materializer на приложение</small>
+				</section>
+
+				<section>
+					<p>Как может быть устроен Source? Рассмотрим на примере
+					устаревшего ActorPublisher
+
+					<p><small>(интерфейс слишком низкоуровневый и от него отказались
+					в пользу более удобных инструментов)</small>
+				</section>
+
+				<section>
+					<pre><code class="scala">class MyPublisher(source: Iterator[Int]) 
+    extends ActorPublisher[Int] {
+  override def receive = {
+    case Request(_) =&gt; sendNext()
+    case Cancel =&gt; context.stop(self)
+  }
+
+  private def sendNext() {
+    while (isActive &amp;&amp; totalDemand &gt; 0) {
+      if (source.hasNext) 
+        onNext(source.next())
+      else 
+        onCompleteThenStop()
+    }
+  }
+}
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Интеграция через Source.queue
+					<pre><code class="scala">val source: Source[Int, SourceQueueWithComplete[Int]] =
+  Source.queue[Int](bufferSize = 1000, 
+                    OverflowStrategy.backpressure)
+// backpressure или выбрасываем элементы </code></pre>
+
+					<pre class="fragment"><code class="scala">val queue: SourceQueueWithComplete[Int] = source
+                  .to(Sink.foreach(println))
+                  .run() // очередь - "материализованное" значение</code></pre>
+
+					<pre class="fragment"><code class="scala">val result: Future[QueueOfferResult] = queue.offer(1000)
+// при backpressure нужно ждать вычисления Future</code></pre>
+				</section>
+
+				<section>
+					<p>Обычно источники это готовые реализации для:
+					<ul>
+						<li>Выборок из баз данных
+						<li>Сокеты, HTTP, т.п.
+						<li>Файлы
+						<li>Таймер
+					</ul>
+				</section>
+
+				<section>
 					<p>TODO
 				</section>
 
 				<section>
 					<h3>Обзор готовых компонентов</h3>
+					<p>TODO
+				</section>
+
+				<section>
+					<h3>Reactive Streams - стандартное API</h3>
+					<p>Стандартное API для работы с асинхронными потоками
+				</section>
+
+				<section>
+					<p>Разработано для интеграции разных реализаций асинхронных потоков.
+
+					<p class="fragment">Например веб-сервера и драйвера СУБД.
+
+					<p class="fragment">Вошло в Java 9.
+				</section>
+
+				<section>
+					<p>Стандарт состоит из спецификации и test kit.
+
+					<p>Предназначен для разработчиков библиотек.
+				</section>
+
+				<section>
+					<p>Кроме Play Framework и Akka стандарт поддерживается:<br>
+					Spring Framework, RxJava, Vert.x, Netty; существуют драйвера
+					для многих СУБД и хранилищ.
+				</section>
+
+				<section>
+					<h3>HTTP и ввод-вывод</h3>
 					<p>TODO
 				</section>
 
