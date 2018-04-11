@@ -568,8 +568,73 @@ g.run()
 				</section>
 
 				<section>
-					<p>Play поддерживает три вида ответов:
-					<p>TODO
+					<p>Play поддерживает поточные ответы
+
+					<pre><code class="scala">
+Ok.sendEntity(entity)					
+					</code></pre>
+
+					<p>Entity - поток, contentType и режим передачи.
+				</section>
+
+				<section>
+					<p>Известного размера - обычно файлы. 
+					<pre><code class="scala">
+// ByteString - неизменяемый массив байт + rope
+val source: Source[ByteString, _] = response.bodyAsSource
+
+HttpEntity.Streamed(source, Some(contentLength), 
+  contentType = None)
+					</code></pre>
+					<p>размер полезен для индикации прогресса.
+				</section>
+
+				<section>
+					<p>Chunked - длина неизвестна, отдача блоками:
+					<pre><code class="scala">
+HttpEntity.Chunked(source.map(HttpChunk.Chunk), 
+  contentType = None)
+					</code></pre>
+					<p>последний блок нулевого размера 
+				</section>
+
+				<section>
+					<p>Неизвестного размера, отдача потоком
+					<pre><code class="scala">
+HttpEntity.Streamed(source, contentLength = None, 
+  contentType = None)
+					</code></pre>
+					<p>для бесконечный потоков,<br> например Server Sent Events
+				</section>
+
+				<section>
+					<p>Chunked vs Streamed? 
+
+					<ul>
+						<li>Chunked позволяет отличить конец передачи и разрыв соединения
+						<li class="fragment">Chunked не требует разрыва соединения после передачи. Это важно,
+						особенно для HTTPS.
+						<li class="fragment">Streamed хорош для бесконечных потоков - меньше overhead, проще.
+				</section>
+
+				<section>
+					<p>HTTP Клиент в Play может отдать Source
+					<pre><code class="scala">
+wsClient
+  .url(url)
+  .withQueryStringParameters(params: _*)
+  .stream() // Future[WSResponse]
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Из этого легко собрать прокси:
+					<ul>
+						<li>Собрать запрос, передать тело запроса если оно есть
+						<li class="fragment">Вытащить размер из заголовков, определить режим передачи
+						<li class="fragment">Перенести нужные заголовки, Content-Type
+						<li class="fragment">Добавить обработку ошибок
+					</ul>
 				</section>
 
 				<section>
