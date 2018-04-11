@@ -257,6 +257,23 @@ private def sendNext(): Unit = {
 				</section>
 
 				<section>
+					<p>Подключаем в build.sbt
+
+					<pre><code class="scala">
+// версии akka-* должны быть одинаковые
+libraryDependencies += 
+  "com.typesafe.akka" %% "akka-stream" % "2.5.11"
+					</code></pre>
+
+					<p>в Scala
+					<pre><code class="scala">
+import akka.stream._
+import akka.stream.scaladsl._
+					</code></pre>
+				</section>
+
+
+				<section>
 					<p>Источник данных - пример числа от 1 до 100
 
 					<pre><code class="scala">
@@ -338,14 +355,33 @@ implicit val mat: Materializer = ActorMaterializer()
 				</section>
 
 				<section>
+					<p>Sink - конечная точка, например
+					<ul>
+						<li>Sink.seq - сборка коллекции
+						<li>Sink.fold - аналог foldLeft для коллекций
+						<li>Sink.head/last - первый/последний элемент
+						<li>FileIO.toPath - запись в файл
+						<li>Сеть, СУБД и т.п.
+					</ul>
+				</section>
+
+				<section>
+					<p>Пример: сумма элементов
+					<pre><code class="scala">
+val result: Future[Int] = 
+  Source(Seq.range(1, 1000))
+    .runWith(Sink.fold(zero = 0)(_ + _))
+					</code></pre>
+				</section>
+
+				<section>
 					<p>Функция map/filter для потоков
 					<pre><code class="scala">
 Source(Range(1, 1000))
   .map(_ + 1)
   .filter(_ % 2 == 0)
   .map(_ * 2)
-  .to(Sink.ignore)
-
+  .to(Sink.ignore) // игнорируем результат
 					</code></pre>
 				</section>
 
@@ -415,12 +451,91 @@ private val result: Future[Seq[Int]] = Source(Seq.range(1, 1000))
 				</section>
 
 				<section>
-					<p>TODO
+					<p>Flow - обработчик потока
+
+					<pre><code class="scala">
+source.map(_ + 1).to(Sink.ignore)
+					</code></pre>
+					<p>можно разобрать на части:
+					<pre><code class="scala">
+val flow: Flow[Int, Int, NotUsed] = Flow[Int].map(_ + 1)
+  
+source.via(flow).to(Sink.ignore)
+					</code></pre>
 				</section>
 
 				<section>
-					<h3>Обзор готовых компонентов</h3>
-					<p>TODO
+					<p>Ограничение скорости обработки:
+					<pre><code class="scala">
+Source(Seq.range(1, 1000))
+  .throttle(50, 1.second, 1, ThrottleMode.shaping)
+  .mapAsync(16)(process)
+  .runWith(Sink.ignore)
+					</code></pre>
+					<p>50 элементов в секунду
+				</section>
+
+				<section>
+					<p>Группировка:
+					<pre><code class="scala">
+def processBatch(v: Seq[Int]): Future[Seq[Int]] = ???
+
+source
+  .groupedWithin(1000, 1 minute) // до 1000, в течении минуты
+  .mapAsync(16)(processBatch)
+  .mapConcat(identity) // поток Seq[Int] в поток Int
+  .runWith(Sink.ignore)
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Несколько источников:
+					<pre><code class="scala">
+val source1 = Source(Seq.range(1, 1000))
+val source2 = Source(Seq.range(1, 1000))
+
+// один за другим
+source1.concat(source2)
+
+// по 10 из каждого по порядку
+source1.interleave(source2, 10)
+
+// в порядке готовности
+source1.intersperse(source2)
+					</code></pre>
+				</section>
+
+				<section>
+					<p>GraphDSL: сложные схемы - расщепление, циклы
+
+					<p>Пример: два обработчика потока
+
+					<pre><code class="scala">
+val tweets: Source[Tweet, NotUsed] = ???
+
+val writeAuthors: Sink[Author, NotUsed] = ???
+val writeHashtags: Sink[Hashtag, NotUsed] = ???
+					</code></pre>
+					<p><small>продолжение на следующем слайде</small>
+				</section>
+
+				<section>
+					<pre><code class="scala">
+val g = RunnableGraph.fromGraph(GraphDSL.create() { implicit b =&gt;
+  import GraphDSL.Implicits._
+
+  val bcast = b.add(Broadcast[Tweet](2))
+  tweets ~&gt; bcast.in
+
+  bcast.out(0) ~&gt; Flow[Tweet].map(_.author) ~&gt; writeAuthors
+  bcast.out(1) ~&gt; Flow[Tweet].mapConcat(_.hashtags.toList) 
+                 ~&gt; writeHashtags
+
+  ClosedShape
+})
+
+g.run()
+					</code></pre>
 				</section>
 
 				<section>
