@@ -338,6 +338,83 @@ implicit val mat: Materializer = ActorMaterializer()
 				</section>
 
 				<section>
+					<p>Функция map/filter для потоков
+					<pre><code class="scala">
+Source(Range(1, 1000))
+  .map(_ + 1)
+  .filter(_ % 2 == 0)
+  .map(_ * 2)
+  .to(Sink.ignore)
+
+					</code></pre>
+				</section>
+
+				<section>
+					<p>По умолчанию runtime выполняет операции в одном потоке, собирая
+					цепочки вызовов ("operator fusion").
+
+					<p class="fragment">Это оптимизация для цепочек из простых вызовов,
+					таких много например в akka-http
+				</section>
+
+				<section>
+					<p>Для распараллеливания стадий нужно расставить барьеры:
+					<pre><code class="scala">
+Source(Range(1, 1000)) // первый thread
+  .map(_ + 1).async // барьер оптимизации
+  .filter(_ % 2 == 0) // второй thread
+  .map(_ * 2)
+  .to(Sink.ignore)
+					</code></pre>
+					<p>при многопоточной работе применяются небольшие буферы между
+					стадиями обработки
+				</section>
+
+				<section>
+					<p>Применение асинхронной функции
+					<pre><code class="scala">
+def process(v: Int): Future[Int] = ???
+
+Source(Range(1, 1000))
+  .mapAsync(parallelism = 16)(process) // сохраняет порядок
+  .mapAsyncUnordered(parallelism = 16)(process) // эффективнее
+  .to(Sink.ignore)
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Пример: замена Future.sequence из 5-й части
+
+					<pre><code class="scala">
+def process(v: Int): Future[Int] = ???
+
+val processed: Future[Seq[Int]] = 
+  Future.sequence(Seq.range(1, 10000).map(process))
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Проблемы:
+					<ul>
+						<li>Много параллельных вызовов process не дожидаясь ответа - 
+						не все сервисы это любят.
+						<li class="fragment">Забиваем executor мелкими задачами
+					</ul>
+				</section>
+
+				<section>
+					<p>Замена на потоках:
+					<pre><code class="scala">
+import immutable.Seq // Akka требует immutable
+
+private val result: Future[Seq[Int]] = Source(Seq.range(1, 1000))
+  .mapAsync(parallelism = 16)(process)
+  .runWith(Sink.seq)
+					</code></pre>
+					<p>контроллируем число параллельных process
+				</section>
+
+				<section>
 					<p>TODO
 				</section>
 
