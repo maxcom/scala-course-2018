@@ -62,7 +62,28 @@
 
 				<section>
 					<h3>Практическое задание: обновление ленты в акторе</h3>
-					<p>TODO
+					<ul>
+						<li>Загрузку ленты и классификацию выносим в актор
+						<li>Актор хранит ленту в памяти, запросы Get и Refresh
+						<li>Дубликаты выбрасываем по id
+						<li>Ленту автоматически обновляем раз в 3 минуты
+					</ul>
+				</section>
+
+				<section>
+					<p>Как использовать акторы в контроллерах Play?
+				</section>
+
+				<section>
+					<pre><code class="scala">
+@Singleton // обязательно! иначе акторы будут размножаться 
+class DemoController @Inject()(cc: ControllerComponents, 
+    wsClient: WSClient, actorSystem: ActorSystem)
+  extends AbstractController(cc) {
+  
+  private val helloActor = actorSystem.actorOf(...)
+					</code></pre>
+					<p>подробнее в <a target="_blank" href="https://www.playframework.com/documentation/2.6.x/ScalaAkka">документации</a>
 				</section>
 
 				<section>
