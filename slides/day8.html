@@ -308,7 +308,7 @@ val source: Source[Int, NotUsed] = Source(1 to 100)
 					<pre><code class="scala">
 val result: Future[Done] = source.runForeach(i ⇒ println(i))
 					</code></pre>
-					<p>для запуска потребуется implicit Matelializer - интерпретатор потока
+					<p>для запуска потребуется implicit Materializer - интерпретатор потока
 				</section>
 
 				<section>
