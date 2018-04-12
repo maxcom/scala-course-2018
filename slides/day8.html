@@ -267,7 +267,7 @@ private def sendNext(): Unit = {
 					<ul>
 						<li>В реальном коде flow control сложнее
 						<li>Смеживание "бизнес-логики" и flow-control
-						<li>Дублирование логики в разных реализациях
+						<li>Дублирование логики flow-control в разных реализациях
 					</ul>
 				</section>
 
@@ -358,7 +358,8 @@ implicit val mat: Materializer = ActorMaterializer()
 
 					<pre class="fragment"><code class="scala">val queue: SourceQueueWithComplete[Int] = source
                   .to(Sink.foreach(println))
-                  .run() // очередь - "материализованное" значение</code></pre>
+                  .run() 
+// очередь - "материализованное" значение</code></pre>
 
 					<pre class="fragment"><code class="scala">val result: Future[QueueOfferResult] = queue.offer(1000)
 // при backpressure нужно ждать вычисления Future</code></pre>
@@ -368,9 +369,9 @@ implicit val mat: Materializer = ActorMaterializer()
 					<p>Обычно источники это готовые реализации для:
 					<ul>
 						<li>Выборок из баз данных
-						<li>Сокеты, HTTP, т.п.
-						<li>Файлы
-						<li>Таймер
+						<li>Чтения из сокетов, HTTP, т.п.
+						<li>Чтения из файлов
+						<li>"Тиков" часов (таймера)
 					</ul>
 				</section>
 
@@ -506,6 +507,7 @@ source
   .mapConcat(identity) // поток Seq[Int] в поток Int
   .runWith(Sink.ignore)
 					</code></pre>
+					<p>обработка "пачками" часто эффективнее
 				</section>
 
 				<section>
@@ -540,8 +542,7 @@ val writeHashtags: Sink[Hashtag, NotUsed] = ???
 				</section>
 
 				<section>
-					<pre><code class="scala">
-val g = RunnableGraph.fromGraph(GraphDSL.create() { implicit b =&gt;
+					<pre><code class="scala">val g = RunnableGraph.fromGraph(GraphDSL.create() { implicit b =&gt;
   import GraphDSL.Implicits._
 
   val bcast = b.add(Broadcast[Tweet](2))
@@ -580,7 +581,8 @@ g.run()
 				<section>
 					<p>Кроме Play Framework и Akka стандарт поддерживается:<br>
 					Spring Framework, RxJava, Vert.x, Netty; существуют драйвера
-					для многих СУБД и хранилищ.
+					для многих СУБД и хранилищ (например JDBC, Cassandra, Elasticsearch,
+					Mongo, Kafka и др).
 				</section>
 
 				<section>
@@ -644,6 +646,8 @@ wsClient
   .url(url)
   .withQueryStringParameters(params: _*)
   .stream() // Future[WSResponse]
+
+  // response.bodyAsSource: Source[ByteString, _]
 					</code></pre>
 				</section>
 
