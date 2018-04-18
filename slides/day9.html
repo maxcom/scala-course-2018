@@ -29,7 +29,7 @@
 			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
 				<section>
-					<h3>Часть 9. Event Sourcing и CQRS. Akka Persistence.</h3>
+					<h3>Часть 9. Event Sourcing и CQRS.<br> Akka Persistence.</h3>
 					<p><small>Страничка курса: <a href="https://maxcom.github.io/scala-course/">https://maxcom.github.io/scala-course/</small></a>
 				</section>
 
@@ -63,15 +63,157 @@
 				</section>
 
 				<section>
-					<p>TODO
+					<p>"Идеальная жизнь" с реляционной СУБД
+					<ul>
+						<li class="fragment">Данные нормализованы
+						<li class="fragment">Ссылочная целостность и другие constraint'ы
+						<li class="fragment">ACID транзакции<br>
+						(Atomicity, Consistency, Isolation, Durability)
+					</ul>
 				</section>
 
 				<section>
-					<h3>Akka Persistence</h3>		
+					<p>Можно ли доверять значению в ячейке?
+
+					<p class="fragment">Например количеству денег на счете в банке?
 				</section>
 
 				<section>
-					<p>TODO
+					<p>Нет, правда только в журнале операций над счетом.
+
+					<p class="fragment">Значение в БД - просто cache, вычисленный из журнала.
+				</section>
+
+				<section>
+					<p>Еще пример: типичный компонент "enterprise" системы
+					<ul>
+						<li>Разнообразные "бизнес"-сущности моделированы в виде табличек БД
+						<li>Формочки для редактирования и прочий CRUD
+					</ul>
+				</section>
+
+				<section>
+					<p>Этапы развития:
+					<ul>
+						<li class="fragment">Версия 1 - кодируем модели, формочки; запускаем в работу
+						<li class="fragment">Версия 2 - удаление через флаг вместо DELETE
+						<li class="fragment">Версия 3 - отслеживаем дату последнего исправления и имя редактора
+						<li class="fragment">Версия 4 - полная история изменений
+					</ul>
+				</section>
+
+				<section>
+					<p>История может быть двух видов:
+					<ul>
+						<li class="fragment">Техническая - создается автоматически; не понятна пользователю
+						<li class="fragment">"Бизнес"-история - пишется "руками" одновременно с update
+					</ul>
+				</section>
+
+				<section>
+					<p>Event Sourcing - храним все события, используем их как основной источник "правды".
+
+					<p class="fragment">Событие - неизменяемый уже произошедший факт.
+				</section>
+
+				<section>
+					<p>Что это дает:
+					<ul>
+						<li class="fragment">Полную "честную" историю изменений
+						<li class="fragment">Запись append-only: хорошо для многих видов хранилищ
+						<li class="fragment">Возможность записать дополнительные сведения
+					</ul>
+				</section>
+
+				<section>
+					<p>Есть две проблемы:
+
+					<ul>
+						<li>Истории может быть слишком много
+						<li class="fragment">Не понятно как быстро читать и делать запросы
+					</ul>
+
+					<p class="fragment">Решения обоих проблем дальше
+				</section>
+
+				<section>
+					<h3>Akka Persistence</h3>
+				</section>
+
+				<section>
+					<p>PersistentActor - актор, который сохраняет события в журнал. При рестарте
+					он восстанавливает состояние из журнала.
+				</section>
+				
+				<section>
+					<p>build.sbt
+					<pre><code class="scala">
+// версии всех akka-* должны быть одинаковые
+libraryDependencies += 
+  "com.typesafe.akka" %% "akka-persistence" % "2.5.12"
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Еще нужен плагин для storage. Обычно используют Cassandra, для отладки проще LevelDB
+
+					<pre><code class="scala">
+// плагин встроен, нужна только сама LevelDB
+libraryDependencies += 
+  "org.fusesource.leveldbjni" % "leveldbjni-all" % "1.8"
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Команда - запрос актору на выполнение действия.
+
+					<p class="fragment">Команда проходит валидацию, сохраняет событие и выполняет побочный эффект.
+				</section>
+
+				<section>
+					<pre><code class="scala">class CounterActor extends PersistentActor {
+  override def persistenceId: String = "my-counter-actor"
+
+  private var value: Int = 0
+
+  override def receiveCommand: Receive = {
+    case Increment(n) ⇒ persist(Incremented(n)) { event ⇒ 
+      // callback
+      value += event.n
+      sender() ! Ack
+    }
+  }
+
+  override def receiveRecover: Receive = ???
+}</code></pre>
+				</section>
+
+				<section>
+					<p>persist асинхронный, но для нас он делает:
+
+					<ul>
+						<li class="fragment">stash, так что события не приходят пока идет запись
+						<li class="fragment">callback запускается в receive актора, имеет доступ к state
+						<li class="fragment">sender() соответствует отправителю команды
+					</ul>
+				</section>
+
+				<section>
+					<p>receiveRecover - восстанавливает актор; не делает побочных эффектов
+					<pre><code class="scala">
+override def receiveCommand: Receive = {
+  case Increment(n) ⇒ // команда
+    persist(Incremented(n)) { event ⇒
+      value += event.n
+      sender() ! Ack
+    }
+}
+
+override def receiveRecover: Receive = {
+  case Incremented(n) ⇒ // событие
+    value += n // не отправляем Ack
+}
+					</code></pre>
 				</section>
 
 				<section>
@@ -79,9 +221,53 @@
 				</section>
 
 				<section>
-					<p>TODO
+					<p>Проблема: много событий и восстановление слишком долгое.
+
+					<p class="fragment">Решение - периодически записывать снапшоты.
 				</section>
 
+				<section>
+					<pre><code class="scala">// case class State(value: Int)
+// val SnapshotInterval = 10000
+					
+  override def receiveCommand: Receive = {
+    case Increment(n) ⇒ // команда
+      persist(Incremented(n)) { event ⇒
+        value += event.n
+        sender() ! Ack
+
+        if (lastSequenceNr % SnapshotInterval == 0 
+	    &amp;&amp; lastSequenceNr != 0)
+          saveSnapshot(State(value))  
+      }
+  } </code></pre>
+				</section>
+
+				<section>
+					<p>Восстановление:
+					<pre><code class="scala">
+  override def receiveRecover: Receive = {
+    case Incremented(n) ⇒ 
+      value += n 
+    case SnapshotOffer(metadata, snapshot: State) ⇒ 
+      value = snapshot.value
+  }
+					</code></pre>
+					<p>восстановление по-умолчанию стартует с последнего снапшота (можно настроить
+					разные варианты)
+				</section>
+
+				<section>
+					<p>Что если история слишком большая и не нужна?
+
+					<pre><code class="scala">
+    case SaveSnapshotSuccess(metadata) ⇒
+      deleteMessages(metadata.sequenceNr)
+					</code></pre>
+
+					<p>это вариант для "технических" акторов, которым просто нужно восстановление
+					при рестарте
+				</section>
 
 				<section>
 					<h3>CQRS</h3>		
