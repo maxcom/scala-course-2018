@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Event Sourcing и CQRS. Akka Persistence.</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/moon.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h3>Часть 9. Event Sourcing и CQRS. Akka Persistence.</h3>
+					<p><small>Страничка курса: <a href="https://maxcom.github.io/scala-course/">https://maxcom.github.io/scala-course/</small></a>
+				</section>
+
+				<section>
+					<h2>План</h2>
+                                        <ol>
+						<li>Статус по практическому заданию
+						<li>Event Sourcing
+						<li>Akka Persistence
+						<li>Снапшоты
+						<li>CQRS
+						<li>Akka Persistence Query
+					</ol>
+				</section>
+
+				<section>
+					<p>План задания
+					<ol>
+						<li>Классификатор текстов
+						<li>Reads для vk.com (только reads! writes не нужно)
+						<li>Стемминг и диагностика
+						<li>Сервис категоризации
+						<li>Оценка сообщений соц. сетей - API vk.com<br>
+						<li>Опрос новых записей 
+						<li><s>хранение состояния на диске</s>
+					</ol>
+				</section>
+
+				<section>
+					<h3>Event Sourcing</h3>		
+				</section>
+
+				<section>
+					<p>TODO
+				</section>
+
+				<section>
+					<h3>Akka Persistence</h3>		
+				</section>
+
+				<section>
+					<p>TODO
+				</section>
+
+				<section>
+					<h3>Снапшоты</h3>		
+				</section>
+
+				<section>
+					<p>TODO
+				</section>
+
+
+				<section>
+					<h3>CQRS</h3>		
+				</section>
+
+				<section>
+					<p>TODO
+				</section>
+
+
+				<section>
+					<h3>Akka Persistence Query</h3>		
+				</section>
+
+				<section>
+					<p>TODO
+				</section>
+
+				<section>
+					<p>Напоминаю:
+					<ul>
+						<li>Страничка курса: <a href="https://maxcom.github.io/scala-course/">https://maxcom.github.io/scala-course/</a>
+						<li>Посещения - отмечаем на листочке
+					</ul>
+				</section>
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+                                controls: true,
+                                progress: true,
+                                history: true,
+                                center: true,
+
+                                transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+
+	</body>
+</html>
