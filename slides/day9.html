@@ -271,24 +271,119 @@ override def receiveRecover: Receive = {
 
 				<section>
 					<h3>CQRS</h3>		
+					<p>command-query responsibility segregation
 				</section>
 
 				<section>
-					<img src="arch_cqrs_messaging.png" style="max-height: 80vh">
+					<p>Проблема: реалиционные БД универсальны, но они не всегда
+					могут быстро выполнить запрос. 
+					
+					<p class="fragment">И на практике могут выполнить не любой запрос
+					(например не могут полнотекстовый поиск).
+				</section>
+
+				<section>
+					<p>В итоге появляются:
+
+					<ul>
+						<li>Производные данные в БД (предрассчитанные аггрегаты,
+						значения из связанных таблиц, и другие варианты денормализации)
+
+						<li class="fragment">Внешние системы: поиск, аналитика, кеши и т.п.
+					</ul>
+				</section>
+
+				<section>
+					<p>Принцим CQRS - четкое разделение на две части:
+					<ul>
+						<li>Write side - валидирует и выполняет команды
+						<li>Read side - только читает данные.
+					</ul>
+				</section>
+
+				<section>
+					<p>Каждая часть
+					<ul>
+						<li>Имеет свое хранилище
+						<li>Имеет свои программные интерейсы
+					</ul>
+				</section>
+
+				<section>
+					<img src="arch_cqrs_messaging.png" style="max-height: 50vh">
 					<br><small>© A CQRS Journey – Microsoft</small>
 				</section>
 
 				<section>
-					<p>TODO
+					<p>Если Write Side - реляционная СУБД, то нам нужны:
+					<ul>
+						<li>надежная очередь (транзакции, durability)
+						<li>записывать все события в БД и в очередь
+					</ul>
 				</section>
 
+				<section>
+					<p>Event sourcing + CQRS:
+
+					<ul>
+						<li>Write Side: пишет события в журнал
+						<li>Read Side: дополнительные consumer'ы журнала
+					</ul>
+				</section>
 
 				<section>
 					<h3>Akka Persistence Query</h3>		
 				</section>
 
 				<section>
-					<p>TODO
+					<p>build.sbt
+					<pre><code class="scala">
+// версии всех akka-* должны быть одинаковые
+libraryDependencies += 
+  "com.typesafe.akka" %% "akka-persistence-query" % "2.5.12"
+  					</code></pre>
+				</section>
+
+				<section>
+					<p>Поток событий - реактивный поток
+					<pre><code class="scala">
+// создаем один раз на приложение
+val queries: LeveldbReadJournal = 
+  PersistenceQuery(system).
+    readJournalFor[LeveldbReadJournal]
+      (LeveldbReadJournal.Identifier)
+
+// получаем новый поток событий
+val events: Source[EventEnvelope, NotUsed] =
+  queries.currentEventsByPersistenceId("my-counter-actor", 
+                                       fromSequenceNr = 0)
+
+// нам интересно env.event и env.sequenceNr
+					</code></pre>
+				</section>
+
+				<section>
+					<p>Что можно делать с потоком событий (примеры)?
+
+					<ul>
+						<li>Строить актор с выдержкой из текущего состояния
+						<li>Перекачивать во внешние хранилище (индекс, БД, т.п.)
+						<li>Считать статистику над потоком событий
+						<li>и др.
+					</ul>
+				</section>
+
+				<section>
+					<p>Read side обновляется асинхронно.
+
+					<p class="fragment">Иногда нужно прочитать результат после записи.
+				</section>
+
+				<section>
+					<p>Можно при записи отдать sequenceNq пользователю. 
+
+					<p class="fragment">После реализовать логику ожидания нужного номера
+					в view.
 				</section>
 
 				<section>
