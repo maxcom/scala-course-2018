@@ -30,6 +30,10 @@ layout: default
 
 * Табличка [результатов проверки домашних заданий и посещений](https://docs.google.com/spreadsheets/d/1N9J-5koTlKMN2bpXkREhHM7Y1WyjD2zuoysjpxezlvM/)
 
+# Вопросы к зачету
+
+На зачете будет два вопроса, по одному из каждой половины курса. [Список вопрсов](questions.md).
+
 # Материалы для большого практического задания
 
 * Денис Баженов: [Наивный байесовский классификатор](http://bazhenov.me/blog/2012/06/11/naive-bayes.html) ([сохраненная копия сайта](https://github.com/maxcom/bazhenov.github.com))
